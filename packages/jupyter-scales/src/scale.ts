@@ -53,14 +53,14 @@ abstract class ScaleModel extends WidgetModel {
   initialize(attributes: Backbone.ObjectHash, options: IInitializeOptions) {
     super.initialize(attributes, options);
 
-    // Instantiate Three.js object
+    // Instantiate scale object
     this.initPromise = this.createObject().then(() => {
 
-      // pull in props created by three
-      this.syncToModel({});
-
-      // sync the rest from the server to the model
+      // sync the properties from the server to the model
       this.syncToObject();
+
+      // sync any properties that might have mutated back
+      this.syncToModel({});
 
       // setup msg, model, and children change listeners
       this.setupListeners();

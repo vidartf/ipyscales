@@ -20,17 +20,20 @@ import {
 } from './scale';
 
 
-function functionName(fun: Function) {
+/**
+ * Find the name of the d3-interpolate function
+ */
+function interpolatorName(fun: Function) {
   for (let key of Object.keys(d3Interpolate)) {
     if ((d3Interpolate as any)[key] === fun) {
       return key;
     }
   }
-  throw ReferenceError(`Cannot find name of function ${fun}`);
+  throw ReferenceError(`Cannot find name of interpolator ${fun}`);
 }
 
 /**
- * TODO: Docstring
+ * A widget model of a linear scale
  */
 export
 class LinearScaleModel extends ScaleModel {
@@ -46,16 +49,16 @@ class LinearScaleModel extends ScaleModel {
     };
   }
 
+  /**
+   * Create the wrapped d3-scale scaleLinear object
+   */
   constructObject(): any {
-    debugger;
-    let interpolatorName = this.get('interpolator') || 'interpolate';
-    let interpolator = (d3Interpolate as any)[interpolatorName] as InterpolatorFactory<number, number>;
-    return scaleLinear().domain(this.get('domain'))
-      .range(this.get('range'))
-      .interpolate(interpolator)
-      .clamp(this.get('clamp'));
+    return scaleLinear();
   }
 
+  /**
+   * Sync the model properties to the d3 object.
+   */
   syncToObject() {
     let interpolatorName = this.get('interpolator') || 'interpolate';
     let interpolator = (d3Interpolate as any)[interpolatorName] as InterpolatorFactory<number, number>;
@@ -65,12 +68,15 @@ class LinearScaleModel extends ScaleModel {
       .clamp(this.get('clamp'));
   }
 
+  /**
+   * Synt the d3 object properties to the model.
+   */
   syncToModel(toSet: Backbone.ObjectHash) {
     toSet['domain'] = this.obj.domain();
     toSet['range'] = this.obj.range();
     toSet['clamp'] = this.obj.clamp();
     let interpolator = this.obj.interpolate() as InterpolatorFactory<number, number>;
-    toSet['interpolator'] = functionName(interpolator);
+    toSet['interpolator'] = interpolatorName(interpolator);
     super.syncToModel(toSet);
   }
 

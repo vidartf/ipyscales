@@ -1,5 +1,5 @@
 
-# jupyter-scales
+# ipyscales
 
 [![Build Status](https://travis-ci.org/vidartf/ipyscales.svg?branch=master)](https://travis-ci.org/vidartf/ipyscales)
 [![codecov](https://codecov.io/gh/vidartf/ipyscales/branch/master/graph/badge.svg)](https://codecov.io/gh/vidartf/ipyscales)

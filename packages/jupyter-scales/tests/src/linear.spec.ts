@@ -72,4 +72,39 @@ describe('LinearScaleModel', () => {
         });
     });
 
+    it('should throw an error for an invalid interpolator', () => {
+        let state = {
+          interpolator: 'interpolateFunctionThatDoesNotExist'
+         };
+        let model = createTestModel(LinearScaleModel, state);
+        expect(model).to.be.an(LinearScaleModel);
+        return model.initPromise.catch(reason => {
+          expect(reason).to.match(/.*: Cannot find name of interpolator.*/);
+        });
+    });
+
+    it('should sync to the default interpolator for null', () => {
+        let state = {
+          interpolator: null
+         };
+        let model = createTestModel(LinearScaleModel, state);
+        expect(model).to.be.an(LinearScaleModel);
+        return model.initPromise.then(() => {
+          expect(model.get('interpolator')).to.be('interpolate');
+          expect(model.obj.interpolate()).to.be(interpolate);
+        });
+    });
+
+    it('should sync to the default interpolator for null', () => {
+        let state = {
+          interpolator: undefined
+         };
+        let model = createTestModel(LinearScaleModel, state);
+        expect(model).to.be.an(LinearScaleModel);
+        return model.initPromise.then(() => {
+          expect(model.get('interpolator')).to.be('interpolate');
+          expect(model.obj.interpolate()).to.be(interpolate);
+        });
+    });
+
 });
