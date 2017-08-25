@@ -2,6 +2,10 @@
 // Distributed under the terms of the Modified BSD License.
 
 export {
+  BaseModel
+} from './base'
+
+export {
   ScaleModel
 } from './scale'
 

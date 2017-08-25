@@ -12,11 +12,11 @@ import {
 } from './utils.spec';
 
 import {
-  ScaleModel
+  BaseModel
 } from '../../src/'
 
 
-class TestModel extends ScaleModel {
+class TestModel extends BaseModel {
   constructObject(): any | Promise<any> {
     return {};
   }
@@ -35,7 +35,7 @@ class TestModel extends ScaleModel {
 }
 
 
-class BrokenModel extends ScaleModel {
+class BrokenModel extends BaseModel {
   constructObject(): any | Promise<any> {
     return {};
   }
@@ -50,7 +50,7 @@ class BrokenModel extends ScaleModel {
 delete BrokenModel.prototype.constructObject;
 
 
-describe('ScaleModel', () => {
+describe('BaseModel', () => {
 
   describe('constrution', () => {
 
@@ -79,67 +79,10 @@ describe('ScaleModel', () => {
       });
     });
 
-    it('should be re-creatable from cache', () => {
-      let model = createTestModel(TestModel);
-      return model.initPromise.then(() => {
-        let options = {
-          widget_manager: model.widget_manager,
-          model_id: model.model_id,
-        };
-        return new TestModel({}, options);
-      }).then(m2 => {
-        return m2.initPromise.then(() => {
-          expect(m2.obj).to.be(model.obj);
-          expect(m2.model_id).to.be(model.model_id);
-        });
-      });
-    });
-
-    it('should fail if cache entry has wrong ID', () => {
-      let model = createTestModel(TestModel);
-      return model.initPromise.then(() => {
-        model.obj.ipymodelId = 'Invalid ID';
-        let options = {
-          widget_manager: model.widget_manager,
-          model_id: model.model_id,
-        };
-        function broken() {
-          new TestModel({}, options);
-        }
-        expect(broken).to.throwException(/model id does not match object branding/);
-      });
-    });
-
     it('should be createable with a value', () => {
       let state = { value: 'Foo Bar!' }
       let model = createTestModel(TestModel, state);
       expect(model).to.be.an(TestModel);
-    });
-
-  });
-
-
-  describe('getObjectFromCache()', () => {
-
-    it('should return undefined for undefined cache descriptors', () => {
-      expect(ScaleModel.getObjectFromCache(undefined)).to.be(undefined);
-      expect(ScaleModel.getObjectFromCache({id: undefined!})).to.be(undefined);
-      expect(ScaleModel.getObjectFromCache({id: null!})).to.be(undefined);
-      expect(ScaleModel.getObjectFromCache({id: 'not a valid ID'})).to.be(undefined);
-      expect(ScaleModel.getObjectFromCache({} as any)).to.be(undefined);
-      // Create a mode to ensure it also works if not empty:
-      let model = createTestModel(TestModel);
-      return model.initPromise.then(() => {
-        expect(ScaleModel.getObjectFromCache(undefined)).to.be(undefined);
-      });
-    });
-
-    it('should get an existing model', () => {
-      let model = createTestModel(TestModel);
-      return model.initPromise.then(() => {
-        let cache = ScaleModel.getObjectFromCache(model.getCacheDescriptor());
-        expect(cache).to.be(model.obj);
-      });
     });
 
   });
