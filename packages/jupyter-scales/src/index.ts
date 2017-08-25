@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 export {
-  ScaleModel
+  ScaleModel, ISerializerMap, IInitializeOptions
 } from './scale'
 
 export {
