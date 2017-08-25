@@ -12,11 +12,11 @@ import {
 } from './utils.spec';
 
 import {
-  BaseModel
+  ScaleModel
 } from '../../src/'
 
 
-class TestModel extends BaseModel {
+class TestModel extends ScaleModel {
   constructObject(): any | Promise<any> {
     return {};
   }
@@ -35,7 +35,7 @@ class TestModel extends BaseModel {
 }
 
 
-class BrokenModel extends BaseModel {
+class BrokenModel extends ScaleModel {
   constructObject(): any | Promise<any> {
     return {};
   }
