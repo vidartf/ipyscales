@@ -13,6 +13,9 @@ from ipywidgets import Color
 
 from .scale import ScaleWidget
 
+class VarlenTuple(List):
+    klass = tuple
+    _cast_types = (list,)
 
 class LinearScaleWidget(ScaleWidget):
     """A linear scale widget.
@@ -22,8 +25,8 @@ class LinearScaleWidget(ScaleWidget):
     """
     _model_name = Unicode('LinearScaleModel').tag(sync=True)
 
-    domain = List(trait=CFloat(), default_value=[0., 1.], minlen=2).tag(sync=True)
-    range = List(trait=Union([CFloat(), Color()]), default_value=[0., 1.], minlen=2).tag(sync=True)
+    domain = VarlenTuple(trait=CFloat(), default_value=(0., 1.), minlen=2).tag(sync=True)
+    range = VarlenTuple(trait=Union((CFloat(), Color())), default_value=(0., 1.), minlen=2).tag(sync=True)
 
     interpolator = Unicode('interpolate').tag(sync=True)
     clamp = Bool(False).tag(sync=True)
