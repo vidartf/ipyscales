@@ -1,6 +1,6 @@
 {
   "name": "jupyter-scales",
-  "version": "1.0.0",
+  "version": "1.0.1-0",
   "description": "A widget library for scales",
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",
@@ -58,5 +58,4 @@
     "url": "https://github.com/vidartf/ipyscales/issues"
   },
   "homepage": "https://github.com/vidartf/ipyscales"
-
 }
