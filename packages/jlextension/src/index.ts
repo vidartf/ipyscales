@@ -2,18 +2,22 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  JupyterLabPlugin, JupyterLab
-} from '@jupyterlab/application';
+  Application, IPlugin
+} from '@phosphor/application';
+
+import {
+  Widget
+} from '@phosphor/widgets';
 
 import {
   Token
 } from '@phosphor/coreutils';
 
-import * as yourCode from 'jupyter-scales';
+import * as scales from 'jupyter-scales';
 
 import {
-  INBWidgetExtension
- } from "@jupyter-widgets/jupyterlab-manager";
+  IJupyterWidgetRegistry, ExportMap
+ } from "@jupyter-widgets/base";
 
 
 const EXTENSION_ID = 'jupyter.extensions.jupyter-scales'
@@ -23,37 +27,37 @@ const EXTENSION_ID = 'jupyter.extensions.jupyter-scales'
  * The token identifying the JupyterLab plugin.
  */
 export
-const IExampleExtension = new Token<IExampleExtension>(EXTENSION_ID);
+const IJupyterScales = new Token<IJupyterScales>(EXTENSION_ID);
 
 /**
  * The type of the provided value of the plugin in JupyterLab.
  */
 export
-interface IExampleExtension {
+interface IJupyterScales {
 };
 
 
 /**
  * The notebook diff provider.
  */
-const exampleProvider: JupyterLabPlugin<IExampleExtension> = {
+const scalesProvider: IPlugin<Application<Widget>, IJupyterScales> = {
   id: EXTENSION_ID,
-  requires: [INBWidgetExtension],
+  requires: [IJupyterWidgetRegistry],
   activate: activateWidgetExtension,
   autoStart: true
 };
 
-export default exampleProvider;
+export default scalesProvider;
 
 
 /**
  * Activate the widget extension.
  */
-function activateWidgetExtension(app: JupyterLab, widgetsManager: INBWidgetExtension): IExampleExtension {
+function activateWidgetExtension(app: Application<Widget>, widgetsManager: IJupyterWidgetRegistry): IJupyterScales {
   widgetsManager.registerWidget({
       name: 'jupyter-scales',
-      version: yourCode.JUPYTER_EXTENSION_VERSION,
-      exports: yourCode
+      version: scales.JUPYTER_EXTENSION_VERSION,
+      exports: scales as any as ExportMap,   // Typing isn't smart enough here
     });
   return {};
 }
