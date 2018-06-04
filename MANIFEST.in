@@ -21,9 +21,8 @@ graft examples
 # Javascript files
 graft ipyscales/nbextension
 graft packages
-prune packages/**/node_modules
+prune **/node_modules
 prune packages/**/coverage
-prune packages/**/node_modules
 prune packages/**/lib
 prune packages/**/test/build
 

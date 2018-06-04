@@ -1,4 +1,4 @@
-var loaders = [
+var rules = [
   { test: /\.ts$/, loader: 'ts-loader' },
   { test: /\.json$/, loader: 'json-loader' },
   { test: /\.js$/, loader: "source-map-loader" },
@@ -12,7 +12,7 @@ module.exports = {
     libraryTarget: 'amd'
   },
   module: {
-    loaders: loaders
+    rules: rules
   },
   devtool: 'source-map',
   externals: ['@jupyter-widgets/base'],
