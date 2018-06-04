@@ -9,18 +9,7 @@ from __future__ import print_function
 # the name of the project
 name = 'ipyscales'
 
-#-----------------------------------------------------------------------------
-# Minimal Python version sanity check
-#-----------------------------------------------------------------------------
-
 import sys
-
-v = sys.version_info
-if v[:2] < (2, 7) or (v[0] >= 3 and v[:2] < (3, 3)):
-    # Note: 3.3 is untested, but we'll still allow it
-    error = "ERROR: %s requires Python version 2.7 or 3.3 or above." % name
-    print(error, file=sys.stderr)
-    sys.exit(1)
 
 #-----------------------------------------------------------------------------
 # get on with it
@@ -33,10 +22,15 @@ from glob import glob
 from setuptools import setup, find_packages
 
 from setupbase import (create_cmdclass, install_npm, ensure_targets,
-    combine_commands)
+    combine_commands, ensure_python, get_version)
 
 pjoin = os.path.join
 here = os.path.abspath(os.path.dirname(__file__))
+packages_dir = pjoin(here, 'packages')
+
+ensure_python(['2.7', '>=3.4'])
+
+version = get_version(pjoin(here, name, '_version.py'))
 
 # Representative files that should exist after a successful build
 jstargets = [
@@ -44,16 +38,6 @@ jstargets = [
     os.path.join(here, 'packages', 'jlextension', 'build', 'index.js'),
 ]
 
-version_ns = {}
-with io.open(pjoin(here, name, '_version.py'), encoding="utf8") as f:
-    exec(f.read(), {}, version_ns)
-
-
-cmdclass = create_cmdclass(('jsdeps',))
-cmdclass['jsdeps'] = combine_commands(
-    install_npm(here),
-    ensure_targets(jstargets),
-)
 
 package_data = {
     name: [
@@ -62,10 +46,30 @@ package_data = {
 }
 
 
+data_spec = [
+    ('share/jupyter/nbextensions/ipyscales',
+     name + '/notebook_ext',
+     '*.js'),
+    ('share/jupyter/lab/extensions',
+     'packages/jlextension/dist',
+     '*.tgz'),
+    ('etc/jupyter',
+     'jupyter-config',
+     '**/*.json'),
+]
+
+
+cmdclass = create_cmdclass('js', data_files_spec=data_spec)
+cmdclass['js'] = combine_commands(
+    install_npm(here, build_targets=jstargets, sources=packages_dir),
+    ensure_targets(jstargets),
+)
+
+
 setup_args = dict(
     name            = name,
     description     = 'A widget library for scales',
-    version         = version_ns['__version__'],
+    version         = version,
     scripts         = glob(pjoin('scripts', '*')),
     cmdclass        = cmdclass,
     packages        = find_packages(here),
@@ -81,6 +85,7 @@ setup_args = dict(
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
