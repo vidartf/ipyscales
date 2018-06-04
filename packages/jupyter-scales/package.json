@@ -43,6 +43,7 @@
     "karma-mocha-reporter": "^2.2.5",
     "karma-typescript": "^3.0.12",
     "mocha": "^5.2.0",
+    "rimraf": "^2.6.2",
     "source-map-loader": "^0.2.3",
     "ts-loader": "^4.3.1",
     "typescript": "~2.9.1",
