@@ -48,7 +48,7 @@ package_data = {
 
 data_spec = [
     ('share/jupyter/nbextensions/ipyscales',
-     name + '/notebook_ext',
+     name + '/nbextension/static',
      '*.js'),
     ('share/jupyter/lab/extensions',
      'packages/jlextension/dist',
