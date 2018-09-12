@@ -9,5 +9,6 @@ from ._version import __version__, version_info
 
 from .scale import ScaleWidget
 from .linear import LinearScaleWidget
+from .log import LogScaleWidget
 
 from .nbextension import _jupyter_nbextension_paths

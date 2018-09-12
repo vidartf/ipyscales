@@ -11,7 +11,11 @@ Defines some trait types used by ipsycales
 import re
 
 from ipywidgets import Color
-from traitlets import TraitError
+from traitlets import TraitError, List
+
+class VarlenTuple(List):
+    klass = tuple
+    _cast_types = (list,)
 
 _color_hexa_re = re.compile(r'^#[a-fA-F0-9]{4}(?:[a-fA-F0-9]{4})?$')
 
