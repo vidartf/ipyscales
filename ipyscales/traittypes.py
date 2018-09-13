@@ -19,7 +19,7 @@ class VarlenTuple(List):
 
 _color_hexa_re = re.compile(r'^#[a-fA-F0-9]{4}(?:[a-fA-F0-9]{4})?$')
 
-_color_frac_percent = r'\s*(\d+(\.\d*)|\.\d+)?%?\s*'
+_color_frac_percent = r'\s*(\d+(\.\d*)?|\.\d+)?%?\s*'
 _color_int_percent = r'\s*\d+%?\s*'
 
 _color_rgb = r'rgb\({ip},{ip},{ip}\)'
@@ -35,10 +35,11 @@ _color_rgbhsl_re = re.compile('({0})|({1})|({2})|({3})'.format(
 class FullColor(Color):
 
     def validate(self, obj, value):
-        try:
-            return super(FullColor, self).validate(obj, value)
-        except TraitError:
-            if _color_hexa_re.match(value) or _color_rgbhsl_re.match(value):
-                return value
-            raise
+        if isinstance(value, str):
+            try:
+                return super(FullColor, self).validate(obj, value)
+            except TraitError:
+                if _color_hexa_re.match(value) or _color_rgbhsl_re.match(value):
+                    return value
+                raise
         self.error(obj, value)
