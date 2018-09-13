@@ -6,8 +6,8 @@
 
 import pytest
 
-from ..linear import LinearScaleWidget
+from ..linear import LinearScale
 
 
 def test_linearscale_creation_blank():
-    w = LinearScaleWidget()
+    LinearScale()

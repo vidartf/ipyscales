@@ -10,10 +10,10 @@ Defines linear scale widget, and any supporting functions
 
 from traitlets import Float, Unicode, Union, Bool
 
-from .scale import ScaleWidget
+from .scale import Scale
 from .traittypes import FullColor, VarlenTuple
 
-class LinearScaleWidget(ScaleWidget):
+class LinearScale(Scale):
     """A linear scale widget.
 
     See the documentation for d3-scale's linear for

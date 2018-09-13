@@ -10,10 +10,10 @@ Defines logarithmic scale widget, and any supporting functions
 
 from traitlets import Float, Unicode, Union, Bool
 
-from .scale import ScaleWidget
+from .scale import Scale
 from .traittypes import FullColor, VarlenTuple
 
-class LogScaleWidget(ScaleWidget):
+class LogScale(Scale):
     """A logarithmic scale widget.
 
     See the documentation for d3-scale's scaleLog for
