@@ -3,11 +3,15 @@
 
 export {
   ScaleModel, ISerializerMap, IInitializeOptions
-} from './scale'
+} from './scale';
 
 export {
   LinearScaleModel
-} from './linear'
+} from './linear';
+
+export {
+  LogScaleModel
+} from './log';
 
 export {
   JUPYTER_EXTENSION_VERSION

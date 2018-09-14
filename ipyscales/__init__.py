@@ -7,7 +7,16 @@
 
 from ._version import __version__, version_info
 
-from .scale import ScaleWidget
-from .linear import LinearScaleWidget
+from .scale import Scale
+from .linear import LinearScale
+from .log import LogScale
+from .color import LinearColorScale, LogColorScale
+
+# do not import data widgets, to ensure optional dep. on ipydatawidget
 
 from .nbextension import _jupyter_nbextension_paths
+
+
+# deprecated:
+LinearScaleWidget = LinearScale
+ScaleWidget = Scale

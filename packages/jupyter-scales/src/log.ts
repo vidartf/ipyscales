@@ -6,7 +6,7 @@ import {
 } from '@jupyter-widgets/base';
 
 import {
-  scaleLinear
+  scaleLog
 } from 'd3-scale';
 
 import {
@@ -18,14 +18,15 @@ import {
 } from './continuous';
 
 
+
 /**
  * A widget model of a linear scale
  */
 export
-class LinearScaleModel extends ContinuousScaleModel {
+class LogScaleModel extends ContinuousScaleModel {
   defaults() {
     return {...super.defaults(),
-      _model_name: LinearScaleModel.model_name,
+      _model_name: LogScaleModel.model_name,
     };
   }
 
@@ -33,12 +34,12 @@ class LinearScaleModel extends ContinuousScaleModel {
    * Create the wrapped d3-scale scaleLinear object
    */
   constructObject(): any {
-    return scaleLinear();
+    return scaleLog();
   }
 
   static serializers = {
       ...ContinuousScaleModel.serializers,
     }
 
-  static model_name = 'LinearScaleModel';
+  static model_name = 'LogScaleModel';
 }

@@ -14,7 +14,7 @@ from traitlets import Unicode
 from ._frontend import module_name, module_version
 
 
-class ScaleWidget(Widget):
+class Scale(Widget):
     """A scale widget.
 
     This should be treated as an abstract class, and should
