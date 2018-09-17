@@ -16,7 +16,7 @@ import {
 } from 'jupyter-dataserializers';
 
 import {
-  JUPYTER_EXTENSION_VERSION
+  JUPYTER_EXTENSION_VERSION, MODULE_NAME
 } from './version';
 
 import ndarray = require('ndarray');
@@ -201,7 +201,7 @@ abstract class ScaleModel extends WidgetModel {
   static serializers: ISerializerMap = WidgetModel.serializers;
 
   static model_name: string;    // Base model should not be instantiated directly
-  static model_module = 'jupyter-threeplot';
+  static model_module = MODULE_NAME;
   static model_module_version = JUPYTER_EXTENSION_VERSION;
   static view_name = null;
   static view_module = null;
