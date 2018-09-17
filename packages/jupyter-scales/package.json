@@ -25,13 +25,16 @@
   "dependencies": {
     "@jupyter-widgets/base": "^1.1.10",
     "d3-interpolate": "^1.2.0",
-    "d3-scale": "^2.0.0"
+    "d3-scale": "^2.0.0",
+    "jupyter-dataserializers": "^1.2.0",
+    "ndarray": "^1.0.18"
   },
   "devDependencies": {
     "@types/d3-interpolate": "^1.2.0",
     "@types/d3-scale": "^2.0.1",
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^5.2.1",
+    "@types/ndarray": "^1.0.6",
     "@types/node": "^10.3.0",
     "expect.js": "^0.3.1",
     "json-loader": "^0.5.7",

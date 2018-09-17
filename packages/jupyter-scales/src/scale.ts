@@ -6,8 +6,20 @@ import {
 } from '@jupyter-widgets/base';
 
 import {
+  ScaleSequential, ScaleQuantize, scaleQuantize, ScaleQuantile, scaleQuantile,
+  ScaleOrdinal, scaleOrdinal, scaleImplicit
+} from 'd3-scale';
+
+import {
+  data_union_serialization, listenToUnion, getArray, TypedArray,
+  DataUnion
+} from 'jupyter-dataserializers';
+
+import {
   JUPYTER_EXTENSION_VERSION
 } from './version';
+
+import ndarray = require('ndarray');
 
 
 
@@ -37,13 +49,14 @@ abstract class ScaleModel extends WidgetModel {
    * Returns default values for the model attributes.
    */
   defaults() {
+    const ctor = this.constructor as any;
     return {...super.defaults(),
-      _model_name: ScaleModel.model_name,
-      _model_module: ScaleModel.model_module,
-      _model_module_version: ScaleModel.model_module_version,
-      _view_name: ScaleModel.view_name as any,
-      _view_module: ScaleModel.view_module as any,
-      _view_module_version: ScaleModel.view_module_version,
+      _model_name: ctor.model_name,
+      _model_module: ctor.model_module,
+      _model_module_version: ctor.model_module_version,
+      _view_name: ctor.view_name,
+      _view_module: ctor.view_module,
+      _view_module_version: ctor.view_module_version,
     };
   }
 
@@ -52,6 +65,7 @@ abstract class ScaleModel extends WidgetModel {
    */
   initialize(attributes: Backbone.ObjectHash, options: IInitializeOptions) {
     super.initialize(attributes, options);
+    this.createPropertiesArrays();
 
     // Instantiate scale object
     this.initPromise = this.createObject().then(() => {
@@ -68,24 +82,37 @@ abstract class ScaleModel extends WidgetModel {
     });
   }
 
+  createPropertiesArrays() {
+    this.datawidgetProperties = [];
+    this.childModelProperties = [];
+    this.simpleProperties = [];
+  }
+
   /**
    * Update the model attributes from the objects properties.
    *
-   * The base method calls `this.set(toSet, 'pushFromObject');`
-   * if `toSet` is given. Overriding methods should add its
-   * properties to the hash before calling the super method.
+   * The base method calls `this.set(toSet, 'pushFromObject');`.
+   * Overriding methods should add any properties not in
+   * simpleProperties to the hash before calling the super
+   * method.
    */
   syncToModel(toSet: Backbone.ObjectHash): void {
-    if (toSet) {
-      // Apply all direct changes at once
-      this.set(toSet, 'pushFromObject');
+    for (let name of this.simpleProperties) {
+      toSet[name] = this.get(name);
     }
+    // Apply all direct changes at once
+    this.set(toSet, 'pushFromObject');
   }
 
   /**
    * Update the model attributes from the objects properties.
    */
-  abstract syncToObject(): void;
+  syncToObject(): void {
+    // Sync the simple properties:
+    for (let name of this.simpleProperties) {
+      this.obj[name](this.get(name));
+    }
+  };
 
   /**
    * Create or return the underlying object this model represents.
@@ -126,14 +153,46 @@ abstract class ScaleModel extends WidgetModel {
    * Called after object initialization is complete.
    */
   setupListeners() {
-      this.on('change', this.onChange, this);
-      this.on('msg:custom', this.onCustomMessage, this);
+    // Handle changes in child model instance props
+    for (let propName of this.childModelProperties) {
+      // register listener for current child value
+      var curValue = this.get(propName) as ScaleModel;
+      if (curValue) {
+        this.listenTo(curValue, 'change', this.onChildChanged.bind(this));
+        this.listenTo(curValue, 'childchange', this.onChildChanged.bind(this));
+      }
+
+      // make sure to (un)hook listeners when child points to new object
+      this.on('change:' + propName, (model: ScaleModel, value: ScaleModel, options: any) => {
+        const prevModel = this.previous(propName) as ScaleModel;
+        const currModel = value;
+        if (prevModel) {
+          this.stopListening(prevModel);
+        }
+        if (currModel) {
+          this.listenTo(currModel, 'change', this.onChildChanged.bind(this));
+          this.listenTo(currModel, 'childchange', this.onChildChanged.bind(this));
+        }
+      }, this);
+    };
+
+    // Handle changes in data widgets/union properties
+    for (let propName of this.datawidgetProperties) {
+      listenToUnion(this, propName, this.onChildChanged.bind(this), false);
+    };
+    this.on('change', this.onChange, this);
+    this.on('msg:custom', this.onCustomMessage, this);
   }
 
   onChange(model: Backbone.Model, options: any) {
     if (options !== 'pushFromObject') {
-        this.syncToObject();
+      this.syncToObject();
     }
+  }
+
+  onChildChanged(model: WidgetModel, options: any) {
+    // Propagate up hierarchy:
+    this.trigger('childchange', this);
   }
 
   onCustomMessage(content: any, buffers: any) {
@@ -157,4 +216,240 @@ abstract class ScaleModel extends WidgetModel {
    * Promise that resolves when initialization is complete.
    */
   initPromise: Promise<void>;
+
+  datawidgetProperties: string[];
+  childModelProperties: string[];
+  simpleProperties: string[];
+}
+
+
+/**
+ * A widget model of a linear scale
+ */
+export abstract class SequentialScaleModel<Output> extends ScaleModel {
+  defaults() {
+    return {...super.defaults(),
+      domain: [0, 1],
+      clamp: false,
+    };
+  }
+
+  createPropertiesArrays() {
+    super.createPropertiesArrays();
+    this.simpleProperties.push(
+      'domain',
+      'clamp',
+    );
+  }
+
+  obj: ScaleSequential<Output>;
+
+  static serializers = {
+    ...ScaleModel.serializers,
+  }
+}
+
+
+/**
+ * A widget model of a linear scale
+ */
+export class QuantizeScaleModel extends ScaleModel {
+  defaults() {
+    return {...super.defaults(),
+      domain: [0, 1],
+      range: [0, 1],
+    };
+  }
+
+  createPropertiesArrays() {
+    super.createPropertiesArrays();
+    this.simpleProperties.push(
+      'domain',
+      'range',
+    );
+  }
+
+  constructObject() {
+    this.obj = scaleQuantize<any>();
+  }
+
+  obj: ScaleQuantize<any>;
+
+  static serializers = {
+    ...ScaleModel.serializers,
+  }
+
+  static model_name = 'QuantizeScaleModel';
+}
+
+
+/**
+ * A widget model of a linear scale
+ */
+export class ArrayScaleModel extends ScaleModel {
+  defaults() {
+    return {...super.defaults(),
+      domain: [0, 1],
+      range: null,
+    };
+  }
+
+  createPropertiesArrays() {
+    super.createPropertiesArrays();
+    this.datawidgetProperties.push('range');
+    this.simpleProperties.push(
+      'domain',
+    );
+  }
+
+  constructObject() {
+    this.obj = scaleQuantize<number>();
+  }
+
+  syncToObject() {
+    super.syncToObject();
+    let range = getArray(this.get('range'));
+    this.obj
+      .range(range && range.data as any)
+  }
+
+  syncToModel(toSet: Backbone.ObjectHash) {
+    const rangeSource = this.get('range') as DataUnion | null;
+    const data = this.obj.range() as any as TypedArray;
+    const rawData = getArray(rangeSource);
+    if (rawData !== null) {
+      rawData.data.set(data);
+    } else {
+      toSet['range'] = ndarray(data, [data.length]);
+    }
+    super.syncToModel(toSet);
+  }
+
+  obj: ScaleQuantize<number>;
+
+  static serializers = {
+    ...ScaleModel.serializers,
+    range: data_union_serialization,
+  }
+
+  static model_name = 'ArrayScaleModel';
+}
+
+
+/**
+ * A widget model of a linear scale
+ */
+export class QuantileScaleModel extends ScaleModel {
+  defaults() {
+    return {...super.defaults(),
+      domain: [0],
+      range: [0],
+    };
+  }
+
+  createPropertiesArrays() {
+    super.createPropertiesArrays();
+    this.simpleProperties.push(
+      'domain',
+      'range',
+    );
+  }
+
+  constructObject() {
+    this.obj = scaleQuantile<any>();
+  }
+
+  obj: ScaleQuantile<any>;
+
+  static serializers = {
+    ...ScaleModel.serializers,
+  }
+
+  static model_name = 'QuantileScaleModel';
+}
+
+
+/**
+ * A widget model of a linear scale
+ */
+export class TresholdScaleModel extends ScaleModel {
+  defaults() {
+    return {...super.defaults(),
+      domain: [],
+      range: [0],
+    };
+  }
+
+  createPropertiesArrays() {
+    super.createPropertiesArrays();
+    this.simpleProperties.push(
+      'domain',
+      'range',
+    );
+  }
+
+  constructObject() {
+    this.obj = scaleQuantile<any>();
+  }
+
+  obj: ScaleQuantile<any>;
+
+  static serializers = {
+    ...ScaleModel.serializers,
+  }
+
+  static model_name = 'TresholdScaleModel';
+}
+
+
+
+/**
+ * A widget model of a linear scale
+ */
+export class OrdinalScaleModel extends ScaleModel {
+  defaults() {
+    return {...super.defaults(),
+      domain: null,
+      range: [],
+      unknown: undefined,
+    };
+  }
+
+  createPropertiesArrays() {
+    super.createPropertiesArrays();
+    this.simpleProperties.push(
+      'domain',
+      'range',
+    );
+  }
+
+  constructObject() {
+    this.obj = scaleOrdinal();
+  }
+
+  syncToObject() {
+    super.syncToObject();
+    let unknown = this.get('unknown');
+    if (unknown === undefined) {
+      unknown = scaleImplicit;
+    }
+    this.obj.unknown(unknown);
+  }
+
+  syncToModel(toSet: Backbone.ObjectHash) {
+    let unknown = this.obj.unknown();
+    if (unknown === scaleImplicit) {
+      unknown = undefined;
+    }
+    toSet['unknown'] = unknown;
+    super.syncToModel(toSet);
+  }
+
+  obj: ScaleOrdinal<any, any>;
+
+  static serializers = {
+    ...ScaleModel.serializers,
+  }
+
+  static model_name = 'OrdinalScaleModel';
 }

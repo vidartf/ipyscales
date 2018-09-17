@@ -6,7 +6,7 @@ import {
 } from '@jupyter-widgets/base';
 
 import {
-  InterpolatorFactory
+  InterpolatorFactory, scaleLinear, scaleLog, scalePow, ScaleLinear
 } from 'd3-scale';
 
 import * as d3Interpolate from 'd3-interpolate';
@@ -46,6 +46,15 @@ export abstract class ContinuousScaleModel extends ScaleModel {
     };
   }
 
+  createPropertiesArrays() {
+    super.createPropertiesArrays();
+    this.simpleProperties.push(
+      'domain',
+      'range',
+      'clamp',
+    );
+  }
+
   /**
    * Create the wrapped d3-scale scaleLinear object
    */
@@ -55,27 +64,112 @@ export abstract class ContinuousScaleModel extends ScaleModel {
    * Sync the model properties to the d3 object.
    */
   syncToObject() {
+    super.syncToObject();
     let interpolatorName = this.get('interpolator') || 'interpolate';
     let interpolator = (d3Interpolate as any)[interpolatorName] as InterpolatorFactory<number, number>;
-    this.obj.domain(this.get('domain'))
-      .range(this.get('range'))
-      .interpolate(interpolator)
-      .clamp(this.get('clamp'));
+    this.obj.interpolate(interpolator);
   }
 
   /**
    * Synt the d3 object properties to the model.
    */
   syncToModel(toSet: Backbone.ObjectHash) {
-    toSet['domain'] = this.obj.domain();
-    toSet['range'] = this.obj.range();
-    toSet['clamp'] = this.obj.clamp();
-    let interpolator = this.obj.interpolate() as InterpolatorFactory<number, number>;
+    let interpolator = this.obj.interpolate() as InterpolatorFactory<any, any>;
     toSet['interpolator'] = interpolatorName(interpolator);
     super.syncToModel(toSet);
   }
 
   static serializers = {
-      ...ScaleModel.serializers,
-    }
+    ...ScaleModel.serializers,
+  }
+}
+
+
+/**
+ * A widget model of a linear scale
+ */
+export
+class LinearScaleModel extends ContinuousScaleModel {
+
+  /**
+   * Create the wrapped d3-scale scaleLinear object
+   */
+  constructObject(): any {
+    return scaleLinear();
+  }
+
+  obj: ScaleLinear<any, any>;
+
+  static serializers = {
+    ...ContinuousScaleModel.serializers,
+  }
+
+  static model_name = 'LinearScaleModel';
+}
+
+
+/**
+ * A widget model of a linear scale
+ */
+export
+class LogScaleModel extends ContinuousScaleModel {
+  defaults() {
+    return {...super.defaults(),
+      base: 10,
+    };
+  }
+
+  createPropertiesArrays() {
+    super.createPropertiesArrays();
+    this.simpleProperties.push(
+      'base',
+    );
+  }
+
+  /**
+   * Create the wrapped d3-scale scaleLinear object
+   */
+  constructObject(): any {
+    return scaleLog();
+  }
+
+  static serializers = {
+    ...ContinuousScaleModel.serializers,
+  }
+
+  static model_name = 'LogScaleModel';
+}
+
+
+/**
+ * A widget model of a linear scale
+ */
+export
+class PowScaleModel extends ContinuousScaleModel {
+  defaults() {
+    this.constructor
+    return {...super.defaults(),
+      exponent: 1,
+    };
+  }
+
+  createPropertiesArrays() {
+    super.createPropertiesArrays();
+    this.simpleProperties.push(
+      'exponent',
+    );
+  }
+
+  /**
+   * Create the wrapped d3-scale scaleLinear object
+   */
+  constructObject(): any {
+    return scalePow();
+  }
+
+  static serializers = {
+    ...ContinuousScaleModel.serializers,
+  }
+
+  static model_name = 'PowScaleModel';
 }
