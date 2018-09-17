@@ -6,8 +6,16 @@
 
 import pytest
 
-from ..linear import LinearScale
+from ..continuous import LinearScale, LogScale, PowScale
 
 
 def test_linearscale_creation_blank():
     LinearScale()
+
+
+def test_logscale_creation_blank():
+    w = LogScale()
+
+
+def test_powscale_creation_blank():
+    w = PowScale()

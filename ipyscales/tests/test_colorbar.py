@@ -8,7 +8,8 @@ import pytest
 
 from traitlets import TraitError
 
-from ..widgets import ColorBar, LinearColorScale
+from ..color import LinearColorScale
+from ..colorbar import ColorBar
 
 
 def test_colorbar_creation_blank():
