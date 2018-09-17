@@ -318,7 +318,7 @@ export class ArrayScaleModel extends ScaleModel {
     const data = this.obj.range() as any as TypedArray;
     const rawData = getArray(rangeSource);
     if (rawData !== null) {
-      rawData.data.set(data);
+      (rawData.data as TypedArray).set(data);
     } else {
       toSet['range'] = ndarray(data, [data.length]);
     }

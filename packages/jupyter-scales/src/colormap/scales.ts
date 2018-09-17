@@ -21,15 +21,15 @@ import {
 
 import {
   LinearScaleModel, LogScaleModel
-} from './continuous';
+} from '../continuous';
 
-import { SequentialScaleModel } from './scale';
+import { SequentialScaleModel } from '../scale';
 
-import { capitalize, unCapitalize } from './util';
+import { capitalize, unCapitalize } from '../util';
 
 import {
   JUPYTER_EXTENSION_VERSION
-} from './version';
+} from '../version';
 
 
 /**

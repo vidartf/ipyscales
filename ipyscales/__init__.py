@@ -7,10 +7,18 @@
 
 from ._version import __version__, version_info
 
-from .scale import Scale
-from .linear import LinearScale
-from .log import LogScale
-from .color import LinearColorScale, LogColorScale
+from .scale import (
+    Scale, SequentialScale, DivergingScale, QuantizeScale, ArrayScale,
+    QuantileScale, TresholdScale, OrdinalScale,
+)
+from .continuous import (
+    ContinuousScale, LinearScale, LogScale, PowScale,
+)
+from .color import (
+    ColorScale, LinearColorScale, LogColorScale,
+    NamedSequentialColorMap, NamedDivergingColorMap,
+)
+from .colorbar import ColorBar, ColorMapEditor
 
 # do not import data widgets, to ensure optional dep. on ipydatawidget
 

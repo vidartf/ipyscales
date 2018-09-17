@@ -39,7 +39,7 @@ class LinearColorScale(LinearScale, ColorScale):
     range = VarlenTuple(trait=FullColor(), default_value=('black', 'white'), minlen=2).tag(sync=True)
 
     def edit(self):
-        from ipycolorbar import ColorMapEditor
+        from .colorbar import ColorMapEditor
         return ColorMapEditor(colormap=self)
 
 @register
@@ -56,7 +56,7 @@ class LogColorScale(LogScale, ColorScale):
     range = VarlenTuple(trait=FullColor(), default_value=('black', 'white'), minlen=2).tag(sync=True)
 
     def edit(self):
-        from ipycolorbar import ColorMapEditor
+        from .colorbar import ColorMapEditor
         return ColorMapEditor(colormap=self)
 
 

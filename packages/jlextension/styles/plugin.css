@@ -1,0 +1,5 @@
+
+/* Ensure strokes use the foreground color */
+svg.ipycolorbar {
+    color: var(--jp-content-font-color1);
+}
