@@ -97,7 +97,7 @@ abstract class ScaleModel extends WidgetModel {
    */
   syncToModel(toSet: Backbone.ObjectHash): void {
     for (let name of this.simpleProperties) {
-      toSet[name] = this.get(name);
+      toSet[name] = this.obj[name]();
     }
     // Apply all direct changes at once
     this.set(toSet, 'pushFromObject');
