@@ -8,7 +8,7 @@
 from ._version import __version__, version_info
 
 from .scale import (
-    Scale, SequentialScale, DivergingScale, QuantizeScale, ArrayScale,
+    Scale, SequentialScale, DivergingScale, QuantizeScale,
     QuantileScale, TresholdScale, OrdinalScale,
 )
 from .continuous import (
