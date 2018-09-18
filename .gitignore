@@ -151,3 +151,6 @@ ipyscales/nbextension/static/index.*
 
 # Test data
 .pytest_cache
+
+# Lab dist
+js/lab/

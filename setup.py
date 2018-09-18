@@ -26,7 +26,7 @@ from setupbase import (create_cmdclass, install_npm, ensure_targets,
 
 pjoin = os.path.join
 here = os.path.abspath(os.path.dirname(__file__))
-packages_dir = pjoin(here, 'packages')
+js_dir = pjoin(here, 'js')
 
 ensure_python(['2.7', '>=3.4'])
 
@@ -62,7 +62,7 @@ data_spec = [
 
 cmdclass = create_cmdclass('js', data_files_spec=data_spec)
 cmdclass['js'] = combine_commands(
-    install_npm(here, build_targets=jstargets, sources=packages_dir),
+    install_npm(js_dir, build_targets=jstargets, sources=js_dir),
     ensure_targets(jstargets),
 )
 

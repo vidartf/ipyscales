@@ -15,8 +15,7 @@ matrix:
 cache:
   pip: true
   directories:
-    - ipyscales/jlextension/node_modules # NPM packages
-    - ts/node_modules # NPM packages
+    - js/node_modules # NPM packages
     - $HOME/.npm
 before_install:
   - pip install -U pip setuptools
@@ -55,9 +54,5 @@ script:
     elif [[ $GROUP == js ]]; then
       npm test
     fi
-before_cache:
-  # Do not cache our own package
-  - |
-    rm -rf packages/jupyterlab-scales/node_modules/jupyter-scales
 after_success:
     - codecov

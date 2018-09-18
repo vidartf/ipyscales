@@ -13,7 +13,7 @@ import {
   Token
 } from '@phosphor/coreutils';
 
-import * as scales from 'jupyter-scales';
+import * as scales from '.';
 
 import {
   IJupyterWidgetRegistry, ExportMap
