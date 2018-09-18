@@ -1,0 +1,5 @@
+
+/* Ensure strokes use the foreground color */
+svg.jupyterColorbar {
+    color: var(--jp-content-font-color1);
+}

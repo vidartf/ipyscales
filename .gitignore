@@ -149,3 +149,8 @@ ipyscales/nbextension/static/index.*
 # -------------
 **/coverage/
 
+# Test data
+.pytest_cache
+
+# Lab dist
+js/lab/

@@ -1,0 +1,106 @@
+{
+  "name": "jupyter-scales",
+  "version": "2.0.0",
+  "description": "A widget library for scales",
+  "main": "lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib/**/*.js",
+    "lib/**/*.js.map",
+    "lib/**/*.d.ts",
+    "dist/*.js",
+    "dist/*.js.map",
+    "dist/*.d.ts",
+    "src/**/*"
+  ],
+  "scripts": {
+    "clean:lib": "rimraf lib && rimraf lab",
+    "clean:nbextension": "rimraf ../../ipyscales/nbextension/static/index.js",
+    "clean": "npm run clean:lib && npm run clean:nbextension",
+    "build:nbextension": "webpack -p",
+    "build:lib": "tsc --project src",
+    "build:lab": "rimraf lab && mkdirp lab && cd lab && npm pack ..",
+    "build": "npm run build:lib && npm run build:nbextension && npm run build:lab",
+    "test": "npm run test:firefox",
+    "test:chrome": "karma start --browsers=Chrome tests/karma.conf.js",
+    "test:debug": "karma start --browsers=Chrome --singleRun=false --debug=true tests/karma.conf.js",
+    "test:firefox": "karma start --browsers=Firefox tests/karma.conf.js",
+    "test:ie": "karma start --browsers=IE tests/karma.conf.js",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "jupyter",
+    "widgets",
+    "jupyterlab",
+    "jupyterlab-extension",
+    "notebook"
+  ],
+  "dependencies": {
+    "@jupyter-widgets/base": "^1.1.10",
+    "@phosphor/coreutils": "^1.3.0",
+    "chromabar": "^0.2.2",
+    "d3-interpolate": "^1.3.2",
+    "d3-scale": "^2.1.2",
+    "d3-scale-chromatic": "^1.3.3",
+    "jupyter-dataserializers": "^1.2.0",
+    "ndarray": "^1.0.18"
+  },
+  "devDependencies": {
+    "@phosphor/application": "^1.6.0",
+    "@phosphor/widgets": "^1.6.0",
+    "@types/d3-interpolate": "^1.2.0",
+    "@types/d3-scale": "^2.0.1",
+    "@types/d3-scale-chromatic": "^1.2.0",
+    "@types/d3-selection": "^1.3.2",
+    "@types/expect.js": "^0.3.29",
+    "@types/mocha": "^5.2.5",
+    "@types/ndarray": "^1.0.6",
+    "@types/node": "^10.10.1",
+    "expect.js": "^0.3.1",
+    "json-loader": "^0.5.7",
+    "karma": "^3.0.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-firefox-launcher": "^1.1.0",
+    "karma-ie-launcher": "^1.0.0",
+    "karma-mocha": "^1.3.0",
+    "karma-mocha-reporter": "^2.2.5",
+    "karma-typescript": "^3.0.13",
+    "mkdirp": "^0.5.1",
+    "mocha": "^5.2.0",
+    "rimraf": "^2.6.2",
+    "source-map-loader": "^0.2.4",
+    "ts-loader": "^5.1.1",
+    "typescript": "~3.0.3",
+    "webpack": "^4.19.1",
+    "webpack-cli": "^3.1.0"
+  },
+  "jupyterlab": {
+    "extension": "lib/plugin",
+    "discovery": {
+      "kernel": [
+        {
+          "kernel_spec": {
+            "language": "^python"
+          },
+          "base": {
+            "name": "ipyscales"
+          },
+          "managers": [
+            "pip",
+            "conda"
+          ]
+        }
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vidartf/ipyscales"
+  },
+  "author": "A widget library for scales",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/vidartf/ipyscales/issues"
+  },
+  "homepage": "https://github.com/vidartf/ipyscales"
+}

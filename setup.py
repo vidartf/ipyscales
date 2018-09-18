@@ -26,7 +26,7 @@ from setupbase import (create_cmdclass, install_npm, ensure_targets,
 
 pjoin = os.path.join
 here = os.path.abspath(os.path.dirname(__file__))
-packages_dir = pjoin(here, 'packages')
+js_dir = pjoin(here, 'js')
 
 ensure_python(['2.7', '>=3.4'])
 
@@ -35,7 +35,8 @@ version = get_version(pjoin(here, name, '_version.py'))
 # Representative files that should exist after a successful build
 jstargets = [
     os.path.join(here, name, 'nbextension', 'static', 'extension.js'),
-    os.path.join(here, 'packages', 'jlextension', 'build', 'index.js'),
+    os.path.join(here, 'js', 'lib', 'index.js'),
+    os.path.join(here, 'js', 'lib', 'plugin.js'),
 ]
 
 
@@ -51,7 +52,7 @@ data_spec = [
      name + '/nbextension/static',
      '*.js'),
     ('share/jupyter/lab/extensions',
-     'packages/jlextension/dist',
+     'js/lab',
      '*.tgz'),
     ('etc/jupyter',
      'jupyter-config',
@@ -61,7 +62,7 @@ data_spec = [
 
 cmdclass = create_cmdclass('js', data_files_spec=data_spec)
 cmdclass['js'] = combine_commands(
-    install_npm(here, build_targets=jstargets, sources=packages_dir),
+    install_npm(js_dir, build_targets=jstargets, sources=js_dir),
     ensure_targets(jstargets),
 )
 
@@ -105,6 +106,8 @@ extras_require = setuptools_args['extras_require'] = {
         'pytest',
         'pytest-cov',
         'nbval',
+    ],
+    'examples': [
     ],
     'docs': [
         'sphinx',

@@ -20,11 +20,10 @@ graft examples
 
 # Javascript files
 graft ipyscales/nbextension
-graft packages
+graft js
 prune **/node_modules
-prune packages/**/coverage
-prune packages/**/lib
-prune packages/**/test/build
+prune js/coverage
+prune js/lib
 
 # Patterns to exclude from any directory
 global-exclude *~

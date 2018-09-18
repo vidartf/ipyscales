@@ -15,8 +15,7 @@ matrix:
 cache:
   pip: true
   directories:
-    - ipyscales/jlextension/node_modules # NPM packages
-    - ts/node_modules # NPM packages
+    - js/node_modules # NPM packages
     - $HOME/.npm
 before_install:
   - pip install -U pip setuptools
@@ -46,18 +45,16 @@ before_script:
     git config --global user.name "Travis CI"
 script:
   - |
+    EXIT_STATUS=0
     if [[ $GROUP == python ]]; then
-      EXIT_STATUS=0
       pushd $(mktemp -d)
       py.test -l --cov-report xml:$TRAVIS_BUILD_DIR/coverage.xml --cov=ipyscales --pyargs ipyscales || EXIT_STATUS=$?
       popd
-      exit $EXIT_STATUS
     elif [[ $GROUP == js ]]; then
-      npm test
+      cd js
+      npm test || EXIT_STATUS=$?
+      popd
     fi
-before_cache:
-  # Do not cache our own package
-  - |
-    rm -rf packages/jupyterlab-scales/node_modules/jupyter-scales
+    exit $EXIT_STATUS
 after_success:
     - codecov
