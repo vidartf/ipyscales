@@ -207,7 +207,7 @@ def setup(app):
         # We don't have a develop install on RTD, ensure we get build output:
         from subprocess import check_call
         popd = os.path.abspath(os.curdir)
-        os.chdir(os.path.join(here, '..', '..'))
+        os.chdir(os.path.join(here, '..', '..', 'js'))
         try:
             check_call(['npm', 'install'])
             check_call(['npm', 'run', 'build'])
