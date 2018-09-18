@@ -110,9 +110,14 @@ extras_require = setuptools_args['extras_require'] = {
     'examples': [
     ],
     'docs': [
-        'sphinx',
+        'sphinx>=1.5',
         'recommonmark',
-        'sphinx_rtd_theme'
+        'sphinx_rtd_theme',
+        'nbsphinx>=0.2.13',
+        'jupyter_sphinx',
+        'nbsphinx-link',
+        'pytest_check_links',
+        'pypandoc',
     ],
 }
 
