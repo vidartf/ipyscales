@@ -14,7 +14,7 @@ module.exports = [
     entry: './src/index.ts',
     output: {
       filename: 'index.js',
-      path: __dirname + '/../../ipyscales/nbextension/static',
+      path: __dirname + '/../ipyscales/nbextension/static',
       libraryTarget: 'amd'
     },
     module: {

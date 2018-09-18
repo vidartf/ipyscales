@@ -11,10 +11,6 @@ Defines color scale widget, and any supporting functions
 from traitlets import Float, Unicode, Bool, Enum
 from ipywidgets import register, Dropdown, jslink, VBox
 
-from ipydatawidgets import (
-    DataUnion, data_union_serialization, shape_constraints
-)
-
 from .scale import Scale, SequentialScale, DivergingScale, OrdinalScale
 from .continuous import LinearScale, LogScale
 from .traittypes import FullColor, VarlenTuple

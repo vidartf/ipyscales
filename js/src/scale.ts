@@ -11,8 +11,7 @@ import {
 } from 'd3-scale';
 
 import {
-  data_union_serialization, listenToUnion, getArray, TypedArray,
-  DataUnion
+  listenToUnion,
 } from 'jupyter-dataserializers';
 
 import {
@@ -280,59 +279,6 @@ export class QuantizeScaleModel extends ScaleModel {
   }
 
   static model_name = 'QuantizeScaleModel';
-}
-
-
-/**
- * A widget model of a linear scale
- */
-export class ArrayScaleModel extends ScaleModel {
-  defaults() {
-    return {...super.defaults(),
-      domain: [0, 1],
-      range: null,
-    };
-  }
-
-  createPropertiesArrays() {
-    super.createPropertiesArrays();
-    this.datawidgetProperties.push('range');
-    this.simpleProperties.push(
-      'domain',
-    );
-  }
-
-  constructObject() {
-    this.obj = scaleQuantize<number>();
-  }
-
-  syncToObject() {
-    super.syncToObject();
-    let range = getArray(this.get('range'));
-    this.obj
-      .range(range && range.data as any)
-  }
-
-  syncToModel(toSet: Backbone.ObjectHash) {
-    const rangeSource = this.get('range') as DataUnion | null;
-    const data = this.obj.range() as any as TypedArray;
-    const rawData = getArray(rangeSource);
-    if (rawData !== null) {
-      (rawData.data as TypedArray).set(data);
-    } else {
-      toSet['range'] = ndarray(data, [data.length]);
-    }
-    super.syncToModel(toSet);
-  }
-
-  obj: ScaleQuantize<number>;
-
-  static serializers = {
-    ...ScaleModel.serializers,
-    range: data_union_serialization,
-  }
-
-  static model_name = 'ArrayScaleModel';
 }
 
 

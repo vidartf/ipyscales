@@ -72,7 +72,7 @@ class DummyManager extends widgets.ManagerBase<HTMLElement> {
             } else {
                 return Promise.reject(`Cannot find class ${className}`)
             }
-        } else if (moduleName === 'jupyter-datawidgets') {
+        } else if (moduleName === 'jupyter-scales') {
             if (this.testClasses[className]) {
                 return Promise.resolve(this.testClasses[className]);
             } else {

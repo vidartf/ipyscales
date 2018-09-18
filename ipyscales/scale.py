@@ -11,8 +11,6 @@ Defiens a scale widget base class, and any supporting functions
 from ipywidgets import Widget, register
 from traitlets import Unicode, CFloat, Bool, Tuple, Any, Undefined
 
-from ipydatawidgets import DataUnion, data_union_serialization, shape_constraints
-
 from ._frontend import module_name, module_version
 
 from .traittypes import VarlenTuple
@@ -71,17 +69,6 @@ class QuantizeScale(Scale):
         default_value=(0., 1.),
         minlen=2,
     ).tag(sync=True)
-
-
-@register
-class ArrayScale(QuantizeScale):
-    """Representation of a scalar lookup table by an array of values."""
-    _model_name = Unicode('ArrayScaleModel').tag(sync=True)
-
-    range = DataUnion(
-        dtype='float32',
-        shape_constraint=shape_constraints(None)
-    ).tag(sync=True, **data_union_serialization)
 
 
 @register

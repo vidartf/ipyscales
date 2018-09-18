@@ -35,7 +35,8 @@ version = get_version(pjoin(here, name, '_version.py'))
 # Representative files that should exist after a successful build
 jstargets = [
     os.path.join(here, name, 'nbextension', 'static', 'extension.js'),
-    os.path.join(here, 'packages', 'jlextension', 'build', 'index.js'),
+    os.path.join(here, 'js', 'lib', 'index.js'),
+    os.path.join(here, 'js', 'lib', 'plugin.js'),
 ]
 
 
@@ -51,7 +52,7 @@ data_spec = [
      name + '/nbextension/static',
      '*.js'),
     ('share/jupyter/lab/extensions',
-     'packages/jlextension/dist',
+     'js/lab',
      '*.tgz'),
     ('etc/jupyter',
      'jupyter-config',
