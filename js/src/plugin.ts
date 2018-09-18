@@ -17,7 +17,9 @@ import * as scales from '.';
 
 import {
   IJupyterWidgetRegistry, ExportMap
- } from "@jupyter-widgets/base";
+} from "@jupyter-widgets/base";
+
+import '../styles/plugin';
 
 
 const EXTENSION_ID = 'jupyter.extensions.jupyter-scales'
@@ -26,14 +28,12 @@ const EXTENSION_ID = 'jupyter.extensions.jupyter-scales'
 /**
  * The token identifying the JupyterLab plugin.
  */
-export
-const IJupyterScales = new Token<IJupyterScales>(EXTENSION_ID);
+export const IJupyterScales = new Token<IJupyterScales>(EXTENSION_ID);
 
 /**
  * The type of the provided value of the plugin in JupyterLab.
  */
-export
-interface IJupyterScales {
+export interface IJupyterScales {
 };
 
 

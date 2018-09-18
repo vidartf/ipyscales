@@ -108,9 +108,9 @@ class ColorBarView extends DOMWidgetView {
       .titlePadding(this.model.get('title_padding'))
       .axisPadding(this.model.get('axis_padding'));
     let svg = select(this.el)
-      .selectAll<SVGSVGElement, null>('svg.ipycolorbar').data([null]);
+      .selectAll<SVGSVGElement, null>('svg.jupyterColorbar').data([null]);
     svg = svg.merge(svg.enter().append<SVGSVGElement>('svg')
-      .attr('class', 'ipycolorbar'));
+      .attr('class', 'jupyterColorbar'));
     svg
       .attr('height', barFunc.minHeight() + 10)
       .attr('width', barFunc.minWidth() + (horizontal ? 30 : 10));
