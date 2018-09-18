@@ -115,8 +115,7 @@ extras_require = setuptools_args['extras_require'] = {
         'sphinx_rtd_theme',
         'nbsphinx>=0.2.13',
         'jupyter_sphinx',
-        'nbsphinx-link',
-        'pytest_check_links',
+        'nbsphinx-link>=1.1.1',
         'pypandoc',
     ],
 }
