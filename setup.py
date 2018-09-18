@@ -107,6 +107,8 @@ extras_require = setuptools_args['extras_require'] = {
         'pytest-cov',
         'nbval',
     ],
+    'examples': [
+    ],
     'docs': [
         'sphinx',
         'recommonmark',

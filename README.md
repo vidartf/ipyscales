@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/vidartf/ipyscales/branch/master/graph/badge.svg)](https://codecov.io/gh/vidartf/ipyscales)
 
 
-A widget library for scales
+A Jupyter widgets library for scales.
 
 ## Installation
 
@@ -21,5 +21,6 @@ Or, if you use jupyterlab:
 
 ```bash
 pip install ipyscales
+jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build
 jupyter labextension install jupyterlab-scales
 ```
