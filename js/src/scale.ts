@@ -223,7 +223,7 @@ abstract class ScaleModel extends WidgetModel {
 
 
 /**
- * A widget model of a linear scale
+ * A widget model of a sequential scale
  */
 export abstract class SequentialScaleModel<Output> extends ScaleModel {
   defaults() {
@@ -250,7 +250,7 @@ export abstract class SequentialScaleModel<Output> extends ScaleModel {
 
 
 /**
- * A widget model of a linear scale
+ * A widget model of a quantize scale
  */
 export class QuantizeScaleModel extends ScaleModel {
   defaults() {
@@ -269,7 +269,7 @@ export class QuantizeScaleModel extends ScaleModel {
   }
 
   constructObject() {
-    this.obj = scaleQuantize<any>();
+    return scaleQuantize<any>();
   }
 
   obj: ScaleQuantize<any>;
@@ -283,7 +283,7 @@ export class QuantizeScaleModel extends ScaleModel {
 
 
 /**
- * A widget model of a linear scale
+ * A widget model of a quantile scale
  */
 export class QuantileScaleModel extends ScaleModel {
   defaults() {
@@ -302,7 +302,7 @@ export class QuantileScaleModel extends ScaleModel {
   }
 
   constructObject() {
-    this.obj = scaleQuantile<any>();
+    return scaleQuantile<any>();
   }
 
   obj: ScaleQuantile<any>;
@@ -316,7 +316,7 @@ export class QuantileScaleModel extends ScaleModel {
 
 
 /**
- * A widget model of a linear scale
+ * A widget model of a teshold scale
  */
 export class TresholdScaleModel extends ScaleModel {
   defaults() {
@@ -335,7 +335,7 @@ export class TresholdScaleModel extends ScaleModel {
   }
 
   constructObject() {
-    this.obj = scaleQuantile<any>();
+    return scaleQuantile<any>();
   }
 
   obj: ScaleQuantile<any>;
@@ -350,12 +350,12 @@ export class TresholdScaleModel extends ScaleModel {
 
 
 /**
- * A widget model of a linear scale
+ * A widget model of an ordinal scale
  */
 export class OrdinalScaleModel extends ScaleModel {
   defaults() {
     return {...super.defaults(),
-      domain: null,
+      domain: [],
       range: [],
       unknown: undefined,
     };
@@ -370,7 +370,7 @@ export class OrdinalScaleModel extends ScaleModel {
   }
 
   constructObject() {
-    this.obj = scaleOrdinal();
+    return scaleOrdinal();
   }
 
   syncToObject() {

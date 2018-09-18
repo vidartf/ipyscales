@@ -3,16 +3,15 @@
 
 import expect = require('expect.js');
 
-import {
-} from '@jupyter-widgets/base';
-
+import { scaleImplicit } from 'd3-scale';
 
 import {
   createTestModel, DummyManager
 } from './utils.spec';
 
 import {
-  ScaleModel
+  ScaleModel, QuantizeScaleModel, QuantileScaleModel, TresholdScaleModel,
+  OrdinalScaleModel
 } from '../../src/'
 
 
@@ -151,6 +150,146 @@ describe('BaseModel', () => {
       return model.initPromise.then(() => {
         model.trigger('msg:custom', {}, []);
         expect(model.customMessages).to.be(1);
+      });
+  });
+
+});
+
+
+describe('QuantizeScaleModel', () => {
+
+  it('should be createable', () => {
+    let model = createTestModel(QuantizeScaleModel);
+    expect(model).to.be.an(QuantizeScaleModel);
+    return model.initPromise.then(() => {
+      expect(typeof model.obj).to.be('function');
+    });
+  });
+
+  it('should have expected default values in model', () => {
+    let model = createTestModel(QuantizeScaleModel);
+    expect(model).to.be.an(QuantizeScaleModel);
+    return model.initPromise.then(() => {
+      expect(model.get('range')).to.eql([0, 1]);
+      expect(model.get('domain')).to.eql([0, 1]);
+    });
+  });
+
+  it('should have expected default values in object', () => {
+      let model = createTestModel(QuantizeScaleModel);
+      expect(model).to.be.an(QuantizeScaleModel);
+      return model.initPromise.then(() => {
+        expect(model.obj.range()).to.eql([0, 1]);
+        expect(model.obj.domain()).to.eql([0, 1]);
+      });
+  });
+
+});
+
+
+describe('QuantileScaleModel', () => {
+
+  it('should be createable', () => {
+    let model = createTestModel(QuantileScaleModel);
+    expect(model).to.be.an(QuantileScaleModel);
+    return model.initPromise.then(() => {
+      expect(typeof model.obj).to.be('function');
+    });
+  });
+
+  it('should have expected default values in model', () => {
+    let model = createTestModel(QuantileScaleModel);
+    expect(model).to.be.an(QuantileScaleModel);
+    return model.initPromise.then(() => {
+      expect(model.get('range')).to.eql([0]);
+      expect(model.get('domain')).to.eql([0]);
+    });
+  });
+
+  it('should have expected default values in object', () => {
+      let model = createTestModel(QuantileScaleModel);
+      expect(model).to.be.an(QuantileScaleModel);
+      return model.initPromise.then(() => {
+        expect(model.obj.range()).to.eql([0]);
+        expect(model.obj.domain()).to.eql([0]);
+      });
+  });
+
+});
+
+
+describe('TresholdScaleModel', () => {
+
+  it('should be createable', () => {
+    let model = createTestModel(TresholdScaleModel);
+    expect(model).to.be.an(TresholdScaleModel);
+    return model.initPromise.then(() => {
+      expect(typeof model.obj).to.be('function');
+    });
+  });
+
+  it('should have expected default values in model', () => {
+    let model = createTestModel(TresholdScaleModel);
+    expect(model).to.be.an(TresholdScaleModel);
+    return model.initPromise.then(() => {
+      expect(model.get('range')).to.eql([0]);
+      expect(model.get('domain')).to.eql([]);
+    });
+  });
+
+  it('should have expected default values in object', () => {
+      let model = createTestModel(TresholdScaleModel);
+      expect(model).to.be.an(TresholdScaleModel);
+      return model.initPromise.then(() => {
+        expect(model.obj.range()).to.eql([0]);
+        expect(model.obj.domain()).to.eql([]);
+      });
+  });
+
+});
+
+
+describe('OrdinalScaleModel', () => {
+
+  it('should be createable', () => {
+    let model = createTestModel(OrdinalScaleModel);
+    expect(model).to.be.an(OrdinalScaleModel);
+    return model.initPromise.then(() => {
+      expect(typeof model.obj).to.be('function');
+    });
+  });
+
+  it('should have expected default values in model', () => {
+    let model = createTestModel(OrdinalScaleModel);
+    expect(model).to.be.an(OrdinalScaleModel);
+    return model.initPromise.then(() => {
+      expect(model.get('range')).to.eql([]);
+      expect(model.get('domain')).to.eql([]);
+      expect(model.get('unknown')).to.be(undefined);
+    });
+  });
+
+  it('should have expected default values in object', () => {
+      let model = createTestModel(OrdinalScaleModel);
+      expect(model).to.be.an(OrdinalScaleModel);
+      return model.initPromise.then(() => {
+        expect(model.obj.range()).to.eql([]);
+        expect(model.obj.domain()).to.eql([]);
+        expect(model.obj.unknown()).to.eql(scaleImplicit);
+      });
+  });
+
+  it('should be createable with non-default values', () => {
+      let state = {
+        range: [0.01, 2.35],
+        domain: [-1e7, 1e5],
+        unknown: 100,
+       };
+      let model = createTestModel(OrdinalScaleModel, state);
+      return model.initPromise.then(() => {
+        expect(model.obj.range()).to.eql([0.01, 2.35]);
+        expect(model.obj.domain()).to.eql([-1e7, 1e5]);
+        expect(model.obj.unknown()).to.be(100);
       });
   });
 

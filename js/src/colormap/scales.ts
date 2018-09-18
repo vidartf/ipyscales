@@ -13,7 +13,7 @@ import {
   scaleSequential
 } from 'd3-scale';
 
-import * as d3Interpolate from 'd3-interpolate';
+import * as d3Chromatic from 'd3-scale-chromatic';
 
 import {
   TypedArray
@@ -24,8 +24,6 @@ import {
 } from '../continuous';
 
 import { SequentialScaleModel } from '../scale';
-
-import { capitalize, unCapitalize } from '../util';
 
 import {
   JUPYTER_EXTENSION_VERSION
@@ -61,33 +59,41 @@ export class LogColorScaleModel extends LogScaleModel {
 
 export type ColorInterpolator = (t: number) => string;
 
+const chromaticInterpLut: {[key: string]: ColorInterpolator} = {};
+for (let key of Object.keys(d3Chromatic)) {
+  if (key.indexOf('interpolate') === 0) {
+    const lowKey = key.slice('interpolate'.length).toLowerCase();
+    chromaticInterpLut[lowKey] = (d3Chromatic as any)[key];
+  }
+}
+
+
 /**
  * A contiguous color map created from a named color map.
  */
 class NamedColorMapBase extends SequentialScaleModel<string> {
 
   getInterpolatorFactory(): ColorInterpolator {
-    let name = this.get('name') as string || 'viridis';
-    name = `interpolate${capitalize(name)}`
-    return (d3Interpolate as any)[name];
+    let name = this.get('name') as string;
+    return chromaticInterpLut[name.toLowerCase()];
   }
 
   getInterpolatorFactoryName(): string | null {
     const interp = this.obj.interpolator();
-    // Do a reverse lookup un d3Interpolate
-    const lut = d3Interpolate as any;
+    // Do a reverse lookup in d3Chromatic
+    const lut = d3Chromatic as any;
     for (let key of Object.keys(lut)) {
       if (interp === lut[key]) {
         const name = key.replace(/^interpolate/, '');
-        return unCapitalize(name);
+        return name;
       }
     }
-    throw new Error(`Unknown color interpolator name: ${interp}`);
+    throw new Error(`Unknown color interpolator name of function: ${interp}`);
   }
 
   constructObject() {
     const interpolator = this.getInterpolatorFactory();
-    this.obj = scaleSequential(interpolator);
+    return scaleSequential(interpolator);
   }
 
   /**
@@ -112,7 +118,7 @@ class NamedColorMapBase extends SequentialScaleModel<string> {
 export class NamedSequentialColorMap extends NamedColorMapBase {
   defaults(): any {
     return {...super.defaults(),
-      name: 'viridis'
+      name: 'Viridis'
     };
   }
 
@@ -135,7 +141,7 @@ export class NamedDivergingColorMap extends NamedColorMapBase {
 
 export interface ColorScale {
   copy(): this;
-  domain(value: number[]): this;
+  domain(domain: [number, number]): this;
   (value: number | { valueOf(): number }): string;
 }
 

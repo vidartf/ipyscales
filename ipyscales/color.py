@@ -8,7 +8,7 @@
 Defines color scale widget, and any supporting functions
 """
 
-from traitlets import Float, Unicode, Bool, Enum
+from traitlets import Float, Unicode, Bool, CaselessStrEnum
 from ipywidgets import register, Dropdown, jslink, VBox
 
 from .scale import Scale, SequentialScale, DivergingScale, OrdinalScale
@@ -60,21 +60,21 @@ class LogColorScale(LogScale, ColorScale):
 # List of valid colormap names 
 # TODO: Write unit test that validates this vs the actual values in d3
 seq_colormap_names = (
-    "viridis",
-    "inferno",
-    "magma",
-    "plasma",
-    "warm",
-    "cool",
-    "cubehelixDefault",
-    "rainbow",
-    "sinebow",
-    "blues",
-    "greens",
-    "greys",
-    "oranges",
-    "purples",
-    "reds",
+    "Viridis",
+    "Inferno",
+    "Magma",
+    "Plasma",
+    "Warm",
+    "Cool",
+    "CubehelixDefault",
+    "Rainbow",
+    "Sinebow",
+    "Blues",
+    "Greens",
+    "Greys",
+    "Oranges",
+    "Purples",
+    "Reds",
     "BuGn",
     "BuPu",
     "GnBu",
@@ -98,7 +98,7 @@ div_colormap_names = (
     "RdGy",
     "RdYlBu",
     "RdYlGn",
-    "spectral",
+    "Spectral",
 )
 
 
@@ -108,7 +108,7 @@ class NamedSequentialColorMap(SequentialScale, ColorScale):
     """
     _model_name = Unicode('NamedContiguousColorMap').tag(sync=True)
 
-    name = Enum(seq_colormap_names, "viridis").tag(sync=True)
+    name = CaselessStrEnum(seq_colormap_names, "Viridis").tag(sync=True)
 
     def dashboard(self):
         "Create linked widgets for this data."
@@ -130,7 +130,7 @@ class NamedDivergingColorMap(DivergingScale, ColorScale):
     """
     _model_name = Unicode('NamedDivergingColorMap').tag(sync=True)
 
-    name = Enum(div_colormap_names, "BrBG").tag(sync=True)
+    name = CaselessStrEnum(div_colormap_names, "BrBG").tag(sync=True)
 
     def dashboard(self):
         "Create linked widgets for this data."

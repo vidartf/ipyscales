@@ -102,8 +102,7 @@ interface Constructor<T> {
     new (attributes?: any, options?: any): T;
 }
 
-export
-function createTestModel<T extends widgets.WidgetModel>(constructor: Constructor<T>, attributes?: any): T {
+export function createTestModel<T extends widgets.WidgetModel>(constructor: Constructor<T>, attributes?: any): T {
   let id = widgets.uuid();
   let widget_manager = new DummyManager();
   let modelOptions = {
@@ -112,4 +111,10 @@ function createTestModel<T extends widgets.WidgetModel>(constructor: Constructor
   }
 
   return new constructor(attributes, modelOptions);
+}
+
+export function createTestView<T extends widgets.WidgetView>(model: widgets.WidgetModel, viewCtor: Constructor<T>): Promise<T> {
+    let mgr = model.widget_manager as DummyManager;
+    mgr.testClasses[model.get('_view_name')] = viewCtor;
+    return model.widget_manager.create_view(model) as any;
 }
