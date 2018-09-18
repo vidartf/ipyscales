@@ -1,6 +1,6 @@
 {
   "name": "jupyter-scales",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "description": "A widget library for scales",
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",
@@ -14,12 +14,13 @@
     "src/**/*"
   ],
   "scripts": {
-    "clean:lib": "rimraf lib",
+    "clean:lib": "rimraf lib && rimraf lab",
     "clean:nbextension": "rimraf ../../ipyscales/nbextension/static/index.js",
     "clean": "npm run clean:lib && npm run clean:nbextension",
     "build:nbextension": "webpack -p",
     "build:lib": "tsc --project src",
-    "build": "npm run build:lib && npm run build:nbextension",
+    "build:lab": "rimraf lab && mkdirp lab && cd lab && npm pack ..",
+    "build": "npm run build:lib && npm run build:nbextension && npm run build:lab",
     "test": "npm run test:firefox",
     "test:chrome": "karma start --browsers=Chrome tests/karma.conf.js",
     "test:debug": "karma start --browsers=Chrome --singleRun=false --debug=true tests/karma.conf.js",
@@ -29,7 +30,10 @@
   },
   "keywords": [
     "jupyter",
-    "widgets"
+    "widgets",
+    "jupyterlab",
+    "jupyterlab-extension",
+    "notebook"
   ],
   "dependencies": {
     "@jupyter-widgets/base": "^1.1.10",
@@ -63,6 +67,22 @@
     "typescript": "~3.0.3",
     "webpack": "^4.10.2",
     "webpack-cli": "^3.0.1"
+  },
+  "jupyterlab": {
+    "extension": true,
+    "discovery": {
+      "kernel": [
+        {
+          "kernel_spec": {
+            "language": "^python"
+          },
+          "base": {
+            "name": "ipyscales"
+          },
+          "managers": ["pip", "conda"]
+        }
+      ]
+    }
   },
   "repository": {
     "type": "git",
