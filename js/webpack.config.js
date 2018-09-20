@@ -18,7 +18,7 @@ module.exports = [
       libraryTarget: 'amd'
     },
     module: {
-      rules: rules
+      rules
     },
     devtool: 'source-map',
     externals,

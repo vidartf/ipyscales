@@ -19,6 +19,7 @@ from .color import (
     NamedSequentialColorMap, NamedDivergingColorMap,
 )
 from .colorbar import ColorBar, ColorMapEditor
+from .radial import RadialScale
 
 # do not import data widgets, to ensure optional dep. on ipydatawidget
 

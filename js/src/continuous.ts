@@ -88,8 +88,7 @@ export abstract class ContinuousScaleModel extends ScaleModel {
 /**
  * A widget model of a linear scale
  */
-export
-class LinearScaleModel extends ContinuousScaleModel {
+export class LinearScaleModel extends ContinuousScaleModel {
 
   /**
    * Create the wrapped d3-scale scaleLinear object
@@ -111,8 +110,7 @@ class LinearScaleModel extends ContinuousScaleModel {
 /**
  * A widget model of a linear scale
  */
-export
-class LogScaleModel extends ContinuousScaleModel {
+export class LogScaleModel extends ContinuousScaleModel {
   defaults() {
     return {...super.defaults(),
       base: 10,
@@ -144,8 +142,7 @@ class LogScaleModel extends ContinuousScaleModel {
 /**
  * A widget model of a linear scale
  */
-export
-class PowScaleModel extends ContinuousScaleModel {
+export class PowScaleModel extends ContinuousScaleModel {
   defaults() {
     this.constructor
     return {...super.defaults(),

@@ -35,6 +35,9 @@ module.exports = function (config) {
           "directory": "coverage",
           "filename": "coverage.lcov"
         }
+      },
+      coverageOptions: {
+        instrumentation: !config.debug
       }
     }
   });
