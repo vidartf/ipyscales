@@ -12,7 +12,7 @@ from traitlets import Float, CFloat, Unicode, List, Union, Bool, Any
 from ipywidgets import Color, register
 
 from .scale import Scale
-from .traittypes import FullColor, VarlenTuple
+from .traittypes import VarlenTuple
 
 
 class ContinuousScale(Scale):
