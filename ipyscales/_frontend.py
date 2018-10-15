@@ -1,3 +1,3 @@
 
 module_name = "jupyter-scales"
-module_version = "^1.0.0"
+module_version = "^2.0.0"
