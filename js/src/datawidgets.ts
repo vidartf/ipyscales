@@ -16,12 +16,20 @@ import {
 } from 'jupyter-dataserializers';
 
 import {
-  NDArrayBaseModel
-} from 'jupyter-datawidgets/lib/ndarray';
+  DataModel
+} from 'jupyter-datawidgets/lib/base';
+
+import {
+  isColorMapModel
+} from './colormap';
 
 import {
   LinearScaleModel
 } from './continuous';
+
+import {
+  version, moduleName
+} from './version';
 
 
 import ndarray = require('ndarray');
@@ -36,39 +44,75 @@ function undefSerializer(obj: any, widget?: WidgetModel): undefined {
 
 
 /**
- * Utility to create a copy of an ndarray
+ * Create new ndarray, with default attributes taken from another
  *
  * @param {ndarray.NDArray} array
  * @returns {ndarray.NDArray}
  */
-export function copyArray(array: ndarray, dtype?: ndarray.DataType): ndarray {
-  if (dtype === undefined) {
-    return ndarray((array.data as TypedArray).slice(),
-                   array.shape,
-                   array.stride,
-                   array.offset);
-  }
-  let ctor: TypedArrayConstructor;
+export function arrayFrom(
+  array: ndarray,
+  dtype?: ndarray.DataType | null,
+  shape?: number[] | null
+): ndarray {
+
+  dtype = dtype || array.dtype;
+  shape = shape || array.shape;
   if (dtype === 'buffer' || dtype === 'generic' || dtype === 'array') {
-    throw new Error(`Cannot copy ndarray of dtype "${dtype}".`);
+    throw new Error(`Cannot create ndarray of dtype "${dtype}".`);
   }
-  return ndarray(new typesToArray[dtype](array.data as TypedArray),
-                 array.shape,
-                 array.stride,
-                 array.offset)
+  return ndarray(
+    new typesToArray[dtype](shape.reduce((ac, v) => {
+      ac *= v;
+      return ac;
+    }, 1)),
+    shape,
+    array.stride,
+    array.offset,
+  );
 }
 
 
 /**
  * Whether two ndarrays differ in shape.
  */
-function arrayShapesDiffer(a: ndarray | null, b: ndarray | null) {
+function shapesDiffer(a: number[] | null, b: number[] | null) {
   if (a === null && b === null) {
     return false;
   }
   return a === null || b === null ||
-    JSON.stringify(a.shape) !== JSON.stringify(b.shape) ||
-    a.dtype !== b.dtype;
+    JSON.stringify(a) !== JSON.stringify(b);
+}
+
+
+function parseCssColor(color: string): [number, number, number, number] {
+  let m = color.match(/^#([0-9a-f]{6})$/i);
+  if (m) {
+    return [
+      parseInt(m[1].substr(0, 2), 16),
+      parseInt(m[1].substr(2, 2), 16),
+      parseInt(m[1].substr(4, 2), 16),
+      255
+    ];
+  }
+  m = color.match(/^rgb\((\s*(\d+)\s*),(\s*(\d+)\s*),(\s*(\d+)\s*)\)$/i);
+  if (m) {
+    return [
+      parseInt(m[2], 10),
+      parseInt(m[4], 10),
+      parseInt(m[6], 10),
+      255
+    ];
+  }
+  m = color.match(/^rgba\((\s*(\d+)\s*),(\s*(\d+)\s*),(\s*(\d+)\s*),(\s*(\d|\d*\.\d+)\s*)\)$/i);
+  if (m) {
+    return [
+      parseInt(m[2], 10),
+      parseInt(m[4], 10),
+      parseInt(m[6], 10),
+      255 * parseFloat(m[8]),
+    ];
+  }
+  throw new Error(`Invalid CSS color: "${color}"`);
 }
 
 
@@ -79,24 +123,17 @@ function arrayShapesDiffer(a: ndarray | null, b: ndarray | null) {
  * automatically recomputed when either the array or the scale
  * changes.
  *
- * It triggers an event 'change:scaledData' when the array is
- * recomputed. Note: 'scaledData' is a direct propetry, not a
- * model attribute. The event triggers with an argument
- * { resized: boolean}, which indicates whether the array changed
- * size. Note: When the 'resized' flag is false, the old array will
- * have been reused, otherwise a new array is allocated.
- *
  * @export
  * @class ScaledArrayModel
  * @extends {DataModel}
  */
-export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack {
+export class ScaledArrayModel extends DataModel implements IDataWriteBack {
   defaults() {
     return {...super.defaults(), ...{
-      array: ndarray([]),
+      data: ndarray([]),
       scale: null,
-      _model_name: ScaledArrayModel.model_name,
       scaledData: null,
+      output_dtype: 'inherit',
     }} as any;
   }
 
@@ -107,21 +144,26 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
    * @memberof ScaledArrayModel
    */
   computeScaledData(options?: any): void {
-    let array = getArray(this.get('array'));
+    options = typeof options === 'object'
+      ? {...options, setScaled: true}
+      : {setScaled: true};
+    let array = getArray(this.get('data'));
     let scale = this.get('scale') as LinearScaleModel | null;
     // Handle null case immediately:
     if (array === null || scale === null) {
-      this.set('scaledData', null, 'setScaled');
+      this.set('scaledData', null, options);
       return;
     }
     let resized = this.arrayMismatch();
     let scaledData = this.get('scaledData') as ndarray;
     if (resized) {
       // Allocate new array
-      scaledData = copyArray(array, this.scaledDtype());
+      scaledData = arrayFrom(array, this.scaledDtype(), this.scaledShape());
     } else {
       // Reuse data, but wrap in new ndarray object to trigger change
-      const version = (scaledData as any)._version + 1 || 0;
+      const version = scaledData
+        ? (scaledData as any)._version + 1 || 0
+        : 0;
       scaledData = ndarray(
         scaledData.data,
         scaledData.shape,
@@ -135,11 +177,21 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
     let target = scaledData!.data as TypedArray;
 
     // Set values:
-    for (let i = 0; i < data.length; ++i) {
-      target[i] = scale.obj(data[i])
+    if (isColorMapModel(scale)) {
+      for (let i = 0; i < data.length; ++i) {
+        const c = parseCssColor(scale!.obj(data[i]))
+        target[i*4+0] = c[0];
+        target[i*4+1] = c[1];
+        target[i*4+2] = c[2];
+        target[i*4+3] = c[3];
+      }
+    } else {
+      for (let i = 0; i < data.length; ++i) {
+        target[i] = scale.obj(data[i]);
+      }
     }
 
-    this.set('scaledData', scaledData, 'setScaled');
+    this.set('scaledData', scaledData, options);
   }
 
   /**
@@ -170,7 +222,7 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
     this.on('change:scale', this.onChange, this);
 
     // Listen to changes within array and scale models:
-    listenToUnion(this, 'array', this.onChange.bind(this), true);
+    listenToUnion(this, 'data', this.onChange.bind(this), true);
     this.listenTo(this.get('scale'), 'change', this.onChange);
   }
 
@@ -181,18 +233,22 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
       }
       return this.get('scaledData');
     } else {
-      return super.getNDArray(key);
+      return this.get(key);
     }
   }
 
   canWriteBack(key='scaledData'): boolean {
-    if (key === 'array') {
+    if (key === 'data') {
       return true;
     }
     if (key !== 'scaledData') {
       return false;
     }
+    const current = getArray(this.get('data'))
     const scale = this.get('scale') as LinearScaleModel | null;
+    if (isColorMapModel(scale) && current === null) {
+      return false;
+    }
     return !!scale && typeof scale.obj.invert === 'function';
   }
 
@@ -200,15 +256,20 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
     if (key === 'scaledData') {
       // Writing back, we need to feed the data through scale.invert()
 
-      const current = getArray(this.get('array'));
+      const current = getArray(this.get('data'));
       const scale = this.get('scale') as LinearScaleModel | null;
       // Handle null case immediately:
       if (array === null || scale === null) {
-        setArray(this, 'array', null, options);
+        setArray(this, 'data', null, options);
         return;
       }
       // Allocate new array
-      const newArray = copyArray(array, this.scaledDtype());
+      const dtype = current ? current.dtype : array.dtype;
+      // Special case colors, as we allow them to transform the shape
+      const shape = isColorMapModel(scale)
+        ? array.shape.slice(0, array.shape.length-1)
+        : array.shape;
+      const newArray = arrayFrom(array, dtype, shape);
 
       let data = array.data as TypedArray;
       let target = newArray.data as TypedArray;
@@ -218,7 +279,7 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
         target[i] = scale.obj.invert(data[i])
       }
 
-      setArray(this, 'array', newArray, options);
+      setArray(this, 'data', newArray, options);
 
     } else {
       setArray(this, key, array, options);
@@ -232,29 +293,52 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
    * @memberof ScaledArrayModel
    */
   protected onChange(model: WidgetModel, options?: any): void {
-    if (options !== 'setScaled') {
+    if (!options || options.setScaled !== true) {
       this.computeScaledData(options);
     }
   }
 
   /**
-   * Whether the array and scaledData have a mismatch in shape or type.
+   * Whether scaledData has the incorrect shape or type.
    *
    * @protected
    * @returns {boolean}
    * @memberof ScaledArrayModel
    */
   protected arrayMismatch(): boolean {
-    let array = getArray(this.get('array'));
-    return arrayShapesDiffer(array, this.get('scaledData'));
+    const current = this.get('scaledData') as ndarray | null;
+    if (current && current.dtype !== this.scaledDtype()) {
+      return true;
+    }
+    return shapesDiffer(current && current.shape, this.scaledShape());
   }
 
-  protected scaledDtype(): ndarray.DataType | undefined {
-    let array = getArray(this.get('array'));
+  /**
+   * Get what the dtype of the scaled data *should* be
+   */
+  protected scaledDtype(): ndarray.DataType | null {
+    let output_dtype = this.get('output_dtype') as ndarray.DataType | 'inherit';
+    if (output_dtype !== 'inherit') {
+      return output_dtype;
+    }
+    let array = getArray(this.get('data'));
     if (array === null) {
-      return undefined;
+      return null;
     }
     return array.dtype;
+  }
+
+  /**
+   * Get what the shape of the scaled data *should* be
+   */
+  protected scaledShape(): number[] | null {
+    const scale = this.get('scale');
+    const array = getArray(this.get('data'));
+    // Special case colors, as we allow them to transform the shape
+    if (isColorMapModel(scale)) {
+      return array && array.shape.concat(4);
+    }
+    return array && array.shape;
   }
 
   /**
@@ -266,11 +350,13 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
   initPromise: Promise<void>;
 
   static serializers: ISerializers = {
-      ...NDArrayBaseModel.serializers,
-      array: data_union_serialization,
+      ...DataModel.serializers,
+      data: data_union_serialization,
       scale: { deserialize: unpack_models },
       scaledData: {serialize: undefSerializer},
     };
 
   static model_name = 'ScaledArrayModel';
+  static model_module = moduleName;
+  static model_module_version = version;
 }

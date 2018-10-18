@@ -4,16 +4,12 @@
 import expect = require('expect.js');
 
 import {
-  scaleLinear, InterpolatorFactory
-} from 'd3-scale';
-
-import {
   interpolate, interpolateRound
 } from 'd3-interpolate';
 
 import {
   createTestModel
-} from './utils.spec';
+} from './helpers.spec';
 
 import {
   LinearScaleModel, LogScaleModel, PowScaleModel
