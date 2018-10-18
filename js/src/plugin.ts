@@ -56,7 +56,7 @@ export default scalesProvider;
 function activateWidgetExtension(app: Application<Widget>, widgetsManager: IJupyterWidgetRegistry): IJupyterScales {
   widgetsManager.registerWidget({
       name: 'jupyter-scales',
-      version: scales.JUPYTER_EXTENSION_VERSION,
+      version: scales.version,
       exports: scales as any as ExportMap,   // Typing isn't smart enough here
     });
   return {};

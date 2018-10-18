@@ -13,7 +13,7 @@ import {
 import { select } from 'd3-selection';
 
 import {
-  JUPYTER_EXTENSION_VERSION, MODULE_NAME
+  version, moduleName
 } from '../version';
 
 import {
@@ -80,11 +80,11 @@ class ColorMapEditorModel extends DOMWidgetModel {
     }
 
   static model_name = 'ColorMapEditorModel';
-  static model_module = MODULE_NAME;
-  static model_module_version = JUPYTER_EXTENSION_VERSION;
+  static model_module = moduleName;
+  static model_module_version = version;
   static view_name = 'ColorMapEditorView';
-  static view_module = MODULE_NAME;
-  static view_module_version = JUPYTER_EXTENSION_VERSION;
+  static view_module = moduleName;
+  static view_module_version = version;
 }
 
 

@@ -15,7 +15,7 @@ import {
 } from 'jupyter-dataserializers';
 
 import {
-  JUPYTER_EXTENSION_VERSION, MODULE_NAME
+  version, moduleName
 } from './version';
 
 import ndarray = require('ndarray');
@@ -200,11 +200,11 @@ abstract class ScaleModel extends WidgetModel {
   static serializers: ISerializerMap = WidgetModel.serializers;
 
   static model_name: string;    // Base model should not be instantiated directly
-  static model_module = MODULE_NAME;
-  static model_module_version = JUPYTER_EXTENSION_VERSION;
+  static model_module = moduleName;
+  static model_module_version = version;
   static view_name = null;
   static view_module = null;
-  static view_module_version = JUPYTER_EXTENSION_VERSION;
+  static view_module_version = version;
 
   /**
    * The underlying object this model represents.
