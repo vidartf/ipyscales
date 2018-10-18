@@ -16,7 +16,7 @@ from ._frontend import module_name, module_version
 from .traittypes import VarlenTuple
 
 
-# TODO: Add and use an interpolator trait (Enum tested agaisnt d3)
+# TODO: Add and use an interpolator trait (Enum tested against d3)
 
 
 class Scale(Widget):
@@ -34,7 +34,8 @@ class SequentialScale(Scale):
     """
 
     domain = Tuple(
-        (CFloat(), ) * 2,
+        CFloat(),
+        CFloat(),
         default_value=(0., 1.),
     ).tag(sync=True)
 
@@ -46,7 +47,9 @@ class DivergingScale(Scale):
     """
 
     domain = Tuple(
-        (CFloat(), ) * 3,
+        CFloat(),
+        CFloat(),
+        CFloat(),
         default_value=(0., 0.5, 1.),
     ).tag(sync=True)
 
@@ -60,7 +63,8 @@ class QuantizeScale(Scale):
     _model_name = Unicode('QuantizeScaleModel').tag(sync=True)
 
     domain = Tuple(
-        (CFloat(), ) * 2,
+        CFloat(),
+        CFloat(),
         default_value=(0., 1.),
     ).tag(sync=True)
 
