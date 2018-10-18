@@ -106,7 +106,7 @@ div_colormap_names = (
 class NamedSequentialColorMap(SequentialScale, ColorScale):
     """A linear scale widget for colors, initialized from a named color map.
     """
-    _model_name = Unicode('NamedContiguousColorMap').tag(sync=True)
+    _model_name = Unicode('NamedSequentialColorMap').tag(sync=True)
 
     name = CaselessStrEnum(seq_colormap_names, "Viridis").tag(sync=True)
 
