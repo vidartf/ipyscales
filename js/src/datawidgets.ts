@@ -28,6 +28,14 @@ import ndarray = require('ndarray');
 
 
 /**
+ * Serializer that prevents syncing to kernel
+ */
+function undefSerializer(obj: any, widget?: WidgetModel): undefined {
+  return undefined;
+}
+
+
+/**
  * Utility to create a copy of an ndarray
  *
  * @param {ndarray.NDArray} array
@@ -88,6 +96,7 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
       array: ndarray([]),
       scale: null,
       _model_name: ScaledArrayModel.model_name,
+      scaledData: null,
     }} as any;
   }
 
@@ -102,31 +111,35 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
     let scale = this.get('scale') as LinearScaleModel | null;
     // Handle null case immediately:
     if (array === null || scale === null) {
-      let changed = this.scaledData !== null;
-      this.scaledData = null;
-      if (changed) {
-        this.trigger('change:scaledData',
-          this, this.scaledData, {...options, resized: true}
-        );
-      }
+      this.set('scaledData', null, 'setScaled');
       return;
     }
     let resized = this.arrayMismatch();
+    let scaledData = this.get('scaledData') as ndarray;
     if (resized) {
       // Allocate new array
-      this.scaledData = copyArray(array, this.scaledDtype());
+      scaledData = copyArray(array, this.scaledDtype());
+    } else {
+      // Reuse data, but wrap in new ndarray object to trigger change
+      const version = (scaledData as any)._version + 1 || 0;
+      scaledData = ndarray(
+        scaledData.data,
+        scaledData.shape,
+        scaledData.stride,
+        scaledData.offset
+      );
+      // Tag on a version# to differntiate it:
+      (scaledData as any)._version = version;
     }
     let data = array.data as TypedArray;
-    let target = this.scaledData!.data as TypedArray;
+    let target = scaledData!.data as TypedArray;
 
     // Set values:
     for (let i = 0; i < data.length; ++i) {
       target[i] = scale.obj(data[i])
     }
 
-    this.trigger('change:scaledData',
-      this, this.scaledData, {...options, resized}
-    );
+    this.set('scaledData', scaledData, 'setScaled');
   }
 
   /**
@@ -154,19 +167,19 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
    */
   setupListeners(): void {
     // Listen to direct changes on our model:
-    this.on('change', this.onChange, this);
+    this.on('change:scale', this.onChange, this);
 
     // Listen to changes within array and scale models:
-    listenToUnion(this, 'array', this.onChange.bind(this));
+    listenToUnion(this, 'array', this.onChange.bind(this), true);
     this.listenTo(this.get('scale'), 'change', this.onChange);
   }
 
   getNDArray(key='scaledData'): ndarray | null {
     if (key === 'scaledData') {
-      if (this.scaledData === null) {
+      if (this.get('scaledData') === null) {
         this.computeScaledData();
       }
-      return this.scaledData;
+      return this.get('scaledData');
     } else {
       return super.getNDArray(key);
     }
@@ -219,7 +232,9 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
    * @memberof ScaledArrayModel
    */
   protected onChange(model: WidgetModel, options?: any): void {
-    this.computeScaledData(options);
+    if (options !== 'setScaled') {
+      this.computeScaledData(options);
+    }
   }
 
   /**
@@ -231,7 +246,7 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
    */
   protected arrayMismatch(): boolean {
     let array = getArray(this.get('array'));
-    return arrayShapesDiffer(array, this.scaledData);
+    return arrayShapesDiffer(array, this.get('scaledData'));
   }
 
   protected scaledDtype(): ndarray.DataType | undefined {
@@ -241,14 +256,6 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
     }
     return array.dtype;
   }
-
-  /**
-   * The scaled data array.
-   *
-   * @type {(ndarray.NDArray | null)}
-   * @memberof ScaledArrayModel
-   */
-  scaledData: ndarray<any> | null = null;
 
   /**
    * A promise that resolves once the model has finished its initialization.
@@ -262,6 +269,7 @@ export class ScaledArrayModel extends NDArrayBaseModel implements IDataWriteBack
       ...NDArrayBaseModel.serializers,
       array: data_union_serialization,
       scale: { deserialize: unpack_models },
+      scaledData: {serialize: undefSerializer},
     };
 
   static model_name = 'ScaledArrayModel';
