@@ -7,7 +7,7 @@ import { scaleImplicit } from 'd3-scale';
 
 import {
   createTestModel, DummyManager
-} from './utils.spec';
+} from './helpers.spec';
 
 import {
   ScaleModel, QuantizeScaleModel, QuantileScaleModel, TresholdScaleModel,

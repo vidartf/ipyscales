@@ -1,120 +1,47 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-import * as widgets from '@jupyter-widgets/base';
-import * as services from '@jupyterlab/services';
-import * as Backbone from 'backbone';
+import expect = require('expect.js');
 
-let numComms = 0;
+import {
+  arrayEquals, parseCssColor
+} from '../../src/utils';
 
-export
-class MockComm implements widgets.IClassicComm {
-    constructor() {
-        this.comm_id = `mock-comm-id-${numComms}`;
-        numComms += 1;
-    }
-    on_close(fn: Function | null) {
-        this._on_close = fn;
-    }
-    on_msg(fn: Function | null) {
-        this._on_msg = fn;
-    }
-    _process_msg(msg: services.KernelMessage.ICommMsg) {
-        if (this._on_msg) {
-            return this._on_msg(msg);
-        } else {
-            return Promise.resolve();
+
+describe('parseCssColor', () => {
+
+    it('should parse 6-digit hexes', async () => {
+        expect(parseCssColor('#ffffff')).to.eql([255, 255, 255, 255]);
+        expect(parseCssColor('#000000')).to.eql([0, 0, 0, 255]);
+        expect(parseCssColor('#011000')).to.eql([1, 16, 0, 255]);
+    });
+
+    it('should parse rgb strings', async () => {
+        expect(parseCssColor('rgb(  255,255,   255  )')).to.eql([255, 255, 255, 255]);
+        expect(parseCssColor('rgb(0,255,0)')).to.eql([0, 255, 0, 255]);
+        expect(parseCssColor('rgb(010,  255,0)')).to.eql([10, 255, 0, 255]);
+    });
+
+    it('should parse rgba strings', async () => {
+        expect(parseCssColor('rgba(  255,255,   255  ,  1.0  )')).to.eql([255, 255, 255, 255]);
+        expect(parseCssColor('rgba(0,255,0, .1)')).to.eql([0, 255, 0, 26]);
+        expect(parseCssColor('rgba(0,0,0,1. )')).to.eql([0, 0, 0, 255]);
+        expect(parseCssColor('rgba(0,0,0, 1)')).to.eql([0, 0, 0, 255]);
+        expect(parseCssColor('rgba(0,0,0, 0.1 )')).to.eql([0, 0, 0, 26]);
+    });
+
+    it('should throw for invalid string', async () => {
+        const args = [
+            'rgba(0,255,0, .1',
+            'rgba(0,25.5,0, .1)',
+            'rgba(0,255,0)',
+            'rgb(0,255,0, 0.2)',
+            'ffffff',
+            '#ffff0',
+        ];
+        for (let s of args) {
+            expect(parseCssColor).withArgs(s).to.throwError(/Invalid CSS color:/);
         }
-    }
-    open(data?: any, metadata?: any, buffers?: ArrayBuffer[] | ArrayBufferView[]): string {
-        if (this._on_open) {
-            this._on_open();
-        }
-        return '';
-    }
-    close(data?: any, metadata?: any, buffers?: ArrayBuffer[] | ArrayBufferView[]): string {
-        if (this._on_close) {
-            this._on_close();
-        }
-        return '';
-    }
-    send(data?: any, metadata?: any, buffers?: ArrayBuffer[] | ArrayBufferView[]): string {
-        return '';
-    }
-    comm_id: string;
-    target_name: string;
-    _on_msg: Function | null = null;
-    _on_close: Function | null = null;
-    _on_open: Function | null = null;
-}
+    });
 
-export
-class DummyManager extends widgets.ManagerBase<HTMLElement> {
-    constructor() {
-        super();
-        this.el = window.document.createElement('div');
-    }
-
-    display_view(msg: services.KernelMessage.IMessage, view: Backbone.View<Backbone.Model>, options: any) {
-        // TODO: make this a spy
-        // TODO: return an html element
-        return Promise.resolve(view).then(view => {
-            this.el.appendChild(view.el);
-            view.on('remove', () => console.log('view removed', view));
-            return view.el;
-        });
-    }
-
-    protected loadClass(className: string, moduleName: string, moduleVersion: string): Promise<any> {
-        if (moduleName === '@jupyter-widgets/base') {
-            if ((widgets as any)[className]) {
-                return Promise.resolve((widgets as any)[className]);
-            } else {
-                return Promise.reject(`Cannot find class ${className}`)
-            }
-        } else if (moduleName === 'jupyter-scales') {
-            if (this.testClasses[className]) {
-                return Promise.resolve(this.testClasses[className]);
-            } else {
-                return Promise.reject(`Cannot find class ${className}`)
-            }
-        } else {
-            return Promise.reject(`Cannot find module ${moduleName}`);
-        }
-    }
-
-    _get_comm_info() {
-        return Promise.resolve({});
-    }
-
-    _create_comm(comm_target_name: string, model_id: string, data?: any, metadata?: any, buffers?: ArrayBuffer[] | ArrayBufferView[]): Promise<widgets.IClassicComm> {
-        return Promise.resolve(new MockComm());
-    }
-
-    el: HTMLElement;
-
-    testClasses: { [key: string]: any } = {};
-}
-
-
-export
-interface Constructor<T> {
-    new (attributes?: any, options?: any): T;
-}
-
-export function createTestModel<T extends widgets.WidgetModel>(constructor: Constructor<T>, attributes?: any): T {
-  let id = widgets.uuid();
-  let widget_manager = new DummyManager();
-  let modelOptions = {
-      widget_manager: widget_manager,
-      model_id: id,
-  }
-
-  return new constructor(attributes, modelOptions);
-}
-
-export function createTestView<T extends widgets.WidgetView>(model: widgets.WidgetModel, viewCtor: Constructor<T>): Promise<T> {
-    let mgr = model.widget_manager as DummyManager;
-    mgr.testClasses[model.get('_view_name')] = viewCtor;
-    return model.widget_manager.create_view(model) as any;
-}
+});

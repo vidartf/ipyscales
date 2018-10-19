@@ -17,3 +17,4 @@ The widgets have been embedded into the page for demonstrative purposes.
 
     introduction
     colorbar
+    scaled-data

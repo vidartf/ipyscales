@@ -4,12 +4,8 @@
 import expect = require('expect.js');
 
 import {
-  WidgetModel
-} from '@jupyter-widgets/base';
-
-import {
   createTestModel, createTestView
-} from './utils.spec';
+} from './helpers.spec';
 
 import {
   ColorBarModel, ColorBarView,

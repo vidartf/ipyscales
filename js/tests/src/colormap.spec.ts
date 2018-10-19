@@ -4,16 +4,12 @@
 import expect = require('expect.js');
 
 import {
-  WidgetModel
-} from '@jupyter-widgets/base';
-
-import {
   interpolate, interpolateHsl
 } from 'd3-interpolate';
 
 import {
-  createTestModel, createTestView
-} from './utils.spec';
+  createTestModel
+} from './helpers.spec';
 
 import {
   LinearColorScaleModel, LogColorScaleModel,

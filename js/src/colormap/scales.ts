@@ -32,6 +32,8 @@ export class LinearColorScaleModel extends LinearScaleModel {
     };
   }
 
+  isColorScale = true;
+
   static model_name = 'LinearColorScaleModel';
 }
 
@@ -44,6 +46,8 @@ export class LogColorScaleModel extends LogScaleModel {
       range: ['black', 'white'],
     };
   }
+
+  isColorScale = true;
 
   static model_name = 'LogColorScaleModel';
 }
@@ -102,6 +106,8 @@ class NamedColorMapBase extends SequentialScaleModel<string> {
     toSet['name'] = this.getInterpolatorFactoryName();
     super.syncToModel(toSet);
   }
+
+  isColorScale = true;
 }
 
 /**
@@ -139,6 +145,13 @@ export interface ColorScale {
 
 export interface ColorMapModel {
   obj: ColorScale;
+  isColorScale: true;
+}
+
+export function isColorMapModel(candidate: any): candidate is ColorMapModel {
+  return (
+    candidate !== null && candidate !== undefined &&
+    candidate.isColorScale === true);
 }
 
 
