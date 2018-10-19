@@ -19,7 +19,6 @@ from .color import (
     NamedSequentialColorMap, NamedDivergingColorMap,
 )
 from .colorbar import ColorBar, ColorMapEditor
-from .datawidgets import ScaledArray
 
 # do not import data widgets, to ensure optional dep. on ipydatawidget
 

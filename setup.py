@@ -106,8 +106,10 @@ extras_require = setuptools_args['extras_require'] = {
         'pytest',
         'pytest-cov',
         'nbval',
+        'ipydatawidgets',
     ],
     'examples': [
+        'ipydatawidgets',
     ],
     'docs': [
         'sphinx>=1.5',
