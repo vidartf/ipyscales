@@ -2,18 +2,10 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  WidgetModel, ManagerBase
-} from '@jupyter-widgets/base';
-
-import {
   InterpolatorFactory, scaleLinear, scaleLog, scalePow, ScaleLinear
 } from 'd3-scale';
 
 import * as d3Interpolate from 'd3-interpolate';
-
-import {
-  JUPYTER_EXTENSION_VERSION
-} from './version';
 
 import {
   ScaleModel

@@ -5,4 +5,4 @@ export * from './scale';
 export * from './continuous';
 export * from './colormap';
 
-export { JUPYTER_EXTENSION_VERSION } from './version';
+export { version } from './version';

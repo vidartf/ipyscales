@@ -12,7 +12,7 @@ import {
 import { select } from 'd3-selection';
 
 import {
-  JUPYTER_EXTENSION_VERSION, MODULE_NAME
+  version, moduleName
 } from '../version';
 
 
@@ -79,11 +79,11 @@ class ColorBarModel extends DOMWidgetModel {
     }
 
   static model_name = 'ColorBarModel';
-  static model_module = MODULE_NAME;
-  static model_module_version = JUPYTER_EXTENSION_VERSION;
+  static model_module = moduleName;
+  static model_module_version = version;
   static view_name = 'ColorBarView';
-  static view_module = MODULE_NAME;
-  static view_module_version = JUPYTER_EXTENSION_VERSION;
+  static view_module = moduleName;
+  static view_module_version = version;
 }
 
 

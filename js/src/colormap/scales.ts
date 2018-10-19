@@ -2,10 +2,6 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  DOMWidgetModel, unpack_models
-} from '@jupyter-widgets/base';
-
-import {
   rgb
 } from 'd3-color';
 
@@ -24,10 +20,6 @@ import {
 } from '../continuous';
 
 import { SequentialScaleModel } from '../scale';
-
-import {
-  JUPYTER_EXTENSION_VERSION
-} from '../version';
 
 
 /**
