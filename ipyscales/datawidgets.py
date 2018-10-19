@@ -42,8 +42,8 @@ class ScaledArray(NDArraySource):
     # TODO: Use Enum instead of free-text:
     output_dtype = Unicode('inherit').tag(sync=True)
 
-    def __init__(self, array=Undefined, scale=Undefined, **kwargs):
-        super(ScaledArray, self).__init__(array=array, scale=scale, **kwargs)
+    def __init__(self, data=Undefined, scale=Undefined, **kwargs):
+        super(ScaledArray, self).__init__(data=data, scale=scale, **kwargs)
 
     def _get_dtype(self):
         if self.output_dtype == 'inherit':

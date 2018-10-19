@@ -22,4 +22,4 @@ def test_scaled_creation():
     data = np.zeros((2, 4))
     scale = LinearScale()
     w = ScaledArray(data, scale)
-    assert w.array is data
+    assert w.data is data
