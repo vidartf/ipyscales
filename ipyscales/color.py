@@ -9,10 +9,11 @@ Defines color scale widget, and any supporting functions
 """
 
 from traitlets import Float, Unicode, Bool, CaselessStrEnum
-from ipywidgets import register, Dropdown, jslink, VBox
+from ipywidgets import register, jslink, VBox
 
 from .scale import Scale, SequentialScale, DivergingScale, OrdinalScale
 from .continuous import LinearScale, LogScale
+from .selectors import StringDropdown
 from .traittypes import FullColor, VarlenTuple
 
 
@@ -114,11 +115,11 @@ class NamedSequentialColorMap(SequentialScale, ColorScale):
         "Create linked widgets for this data."
         children = []
 
-        w = Dropdown(
+        w = StringDropdown(
             value=self.name,
             options=seq_colormap_names,
             description="Name")
-        jslink((w, "value"), (self, "name"))
+        jslink((self, "name"), (w, "value"))
         children.append(w)
 
         return VBox(children=children)
@@ -136,11 +137,11 @@ class NamedDivergingColorMap(DivergingScale, ColorScale):
         "Create linked widgets for this data."
         children = []
 
-        w = Dropdown(
+        w = StringDropdown(
             value=self.name,
             options=div_colormap_names,
             description="Name")
-        jslink((w, "value"), (self, "name"))
+        jslink((self, "name"), (w, "value"))
         children.append(w)
 
         return VBox(children=children)

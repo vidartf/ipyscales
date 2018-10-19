@@ -4,5 +4,6 @@
 export * from './scale';
 export * from './continuous';
 export * from './colormap';
+export * from './selectors';
 
 export { version } from './version';
