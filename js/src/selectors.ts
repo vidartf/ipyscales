@@ -12,6 +12,7 @@ import {
 import {
   arrayEquals
 } from './utils';
+import { lab } from 'd3-color';
 
 
 /**
@@ -71,7 +72,7 @@ export class StringDropdownModel extends SelectorBaseModel {
   }
 
   set selectedLabel(value: string | null) {
-    this.set({value});
+    this.set({value}, 'fromView');
     this.save_changes();
   }
 
@@ -112,8 +113,11 @@ export class WidgetDropdownModel extends SelectorBaseModel {
 
   updateReverse(model: WidgetModel, value: WidgetMap, options?: any) {
     this.reverseMap = {};
-    for (let key of Object.keys(value)){
-      this.reverseMap[value[key].toJSON({})] = key;
+    for (let key of Object.keys(value)) {
+      const v = value[key];
+      if (v && v.toJSON) {
+        this.reverseMap[value[key].toJSON({})] = key;
+      }
     }
   }
 
@@ -203,6 +207,7 @@ export class DropdownView extends DOMWidgetView {
       option.value = label;
       this.listbox.appendChild(option);
     }
+    this._current_options = labels.slice();
   }
 
   events(): {[e: string]: string} {

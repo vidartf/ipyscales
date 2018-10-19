@@ -16,6 +16,10 @@ import {
 } from '../../src/continuous';
 
 import {
+  LinearColorScaleModel
+} from '../../src/colormap';
+
+import {
   arrayFrom, ScaledArrayModel
 } from '../../src/datawidgets';
 
@@ -46,6 +50,7 @@ async function createWidgetModel(): Promise<ScaledArrayModel> {
       domain: [0, 10],
       range: [-10, -5],
     }, widget_manager);
+  widget_manager.register_model(scale.model_id, Promise.resolve(scale));
 
   let attributes = {
     scale,
@@ -56,6 +61,7 @@ async function createWidgetModel(): Promise<ScaledArrayModel> {
     }, widget_manager)
   };
   const model = createTestModel(ScaledArrayModel, attributes, widget_manager);
+  widget_manager.register_model(model.model_id, Promise.resolve(model));
   await model.initPromise;
   return model;
 }
@@ -76,6 +82,15 @@ describe('ScaledArrayModel', () => {
     expect(model.get('scaledData')).to.be(null);
   });
 
+  it('should not include scaledData in serialization', async () => {
+    const model = await createWidgetModel();
+    const state = await model.widget_manager.get_state();
+    const models = Object.keys(state.state).map(k => state.state[k].state);
+    expect(models.length).to.be(2);
+    expect(models[1]._model_name).to.be('ScaledArrayModel');
+    expect(models[1].scaledData).to.be(undefined);
+  });
+
   it('should compute scaled data when initialized with scale and data', async () => {
     let model = await createWidgetModel();
     expect(model).to.be.an(ScaledArrayModel);
@@ -84,7 +99,7 @@ describe('ScaledArrayModel', () => {
     ]));
   });
 
-  it('should resize when setting scale to null', async () => {
+  it('should trigger change when setting scale to null', async () => {
     let model = await createWidgetModel();
 
     let triggered = false;
@@ -97,7 +112,7 @@ describe('ScaledArrayModel', () => {
     expect(model.get('scaledData')).to.be(null);
   });
 
-  it('should resize when changing from null', async () => {
+  it('should trigger change when changing from null', async () => {
     let model = await createWidgetModel();
 
     let array = model.get('data') as ndarray;
@@ -113,7 +128,7 @@ describe('ScaledArrayModel', () => {
 
   });
 
-  it('should resize when changing dtype', async () => {
+  it('should trigger change when changing dtype', async () => {
     let model = await createWidgetModel();
 
     let array = ndarray(new Float64Array([1, 2, 3, 4, 5, 10]));
@@ -129,7 +144,7 @@ describe('ScaledArrayModel', () => {
 
   });
 
-  it('should not resize when still incomplete', async () => {
+  it('should not trigger change when still incomplete', async () => {
     let model = await createWidgetModel();
 
     let array = model.get('data') as ndarray;
@@ -158,6 +173,32 @@ describe('ScaledArrayModel', () => {
     expect(model).to.be.an(ScaledArrayModel);
     expect(triggered).to.be(true);
     expect(model.get('scaledData')!.data).to.eql(new Float32Array([-9.5, -9, -8.5, -8, -7.5, -10]));
+
+  });
+
+  it('should map to rgba for color scale', async () => {
+    let model = await createWidgetModel();
+
+    let scale = createTestModel(LinearColorScaleModel, {
+      domain: [0, 10],
+      range: ['red', 'blue'],
+    }, model.widget_manager as DummyManager);
+    await scale.initPromise;
+    model.set({
+      scale,
+    });
+
+    // RGBA values from red to blue:
+    expect(model.get('scaledData')!.data).to.eql(
+      new Float32Array([
+        230, 0, 26, 255,
+        204, 0, 51, 255,
+        179, 0, 77, 255,
+        153, 0, 102, 255,
+        128, 0, 128, 255,
+        0,   0, 255, 255
+      ])
+    );
 
   });
 
@@ -233,7 +274,7 @@ describe('ScaledArrayModel', () => {
       let inputArray = model.get('data');
       expect(output.shape).to.eql(inputArray.shape);
       expect(output.data).to.eql(new Float32Array([-9.5, -9, -8.5, -8, -7.5, -5]));
-    })
+    });
 
   });
 
@@ -272,6 +313,18 @@ describe('ScaledArrayModel', () => {
 
       it('should return false for other keys', () => {
         expect(model.canWriteBack('foo')).to.be(false);
+      });
+
+      it('should return false when scale is color scale', () => {
+        let scale = createTestModel(LinearColorScaleModel, {
+          domain: [0, 10],
+          range: ['red', 'blue'],
+        }, model.widget_manager as DummyManager);
+        model.set({
+          scale,
+          data: null
+        });
+        expect(model.canWriteBack()).to.be(false);
       });
 
     });

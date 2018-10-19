@@ -31,6 +31,10 @@ import {
   version, moduleName
 } from './version';
 
+import {
+  parseCssColor
+} from './utils';
+
 
 import ndarray = require('ndarray');
 
@@ -84,38 +88,6 @@ function shapesDiffer(a: number[] | null, b: number[] | null) {
 }
 
 
-function parseCssColor(color: string): [number, number, number, number] {
-  let m = color.match(/^#([0-9a-f]{6})$/i);
-  if (m) {
-    return [
-      parseInt(m[1].substr(0, 2), 16),
-      parseInt(m[1].substr(2, 2), 16),
-      parseInt(m[1].substr(4, 2), 16),
-      255
-    ];
-  }
-  m = color.match(/^rgb\((\s*(\d+)\s*),(\s*(\d+)\s*),(\s*(\d+)\s*)\)$/i);
-  if (m) {
-    return [
-      parseInt(m[2], 10),
-      parseInt(m[4], 10),
-      parseInt(m[6], 10),
-      255
-    ];
-  }
-  m = color.match(/^rgba\((\s*(\d+)\s*),(\s*(\d+)\s*),(\s*(\d+)\s*),(\s*(\d|\d*\.\d+)\s*)\)$/i);
-  if (m) {
-    return [
-      parseInt(m[2], 10),
-      parseInt(m[4], 10),
-      parseInt(m[6], 10),
-      255 * parseFloat(m[8]),
-    ];
-  }
-  throw new Error(`Invalid CSS color: "${color}"`);
-}
-
-
 /**
  * Scaled array model.
  *
@@ -129,7 +101,14 @@ function parseCssColor(color: string): [number, number, number, number] {
  */
 export class ScaledArrayModel extends DataModel implements IDataWriteBack {
   defaults() {
+    const ctor = this.constructor as any;
     return {...super.defaults(), ...{
+      _model_name: ctor.model_name,
+      _model_module: ctor.model_module,
+      _model_module_version: ctor.model_module_version,
+      _view_name: ctor.view_name,
+      _view_module: ctor.view_module,
+      _view_module_version: ctor.view_module_version,
       data: ndarray([]),
       scale: null,
       scaledData: null,
@@ -161,9 +140,7 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
       scaledData = arrayFrom(array, this.scaledDtype(), this.scaledShape());
     } else {
       // Reuse data, but wrap in new ndarray object to trigger change
-      const version = scaledData
-        ? (scaledData as any)._version + 1 || 0
-        : 0;
+      const version = (scaledData as any)._version + 1 || 0;
       scaledData = ndarray(
         scaledData.data,
         scaledData.shape,
@@ -244,9 +221,8 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
     if (key !== 'scaledData') {
       return false;
     }
-    const current = getArray(this.get('data'))
     const scale = this.get('scale') as LinearScaleModel | null;
-    if (isColorMapModel(scale) && current === null) {
+    if (isColorMapModel(scale)) {
       return false;
     }
     return !!scale && typeof scale.obj.invert === 'function';
@@ -266,9 +242,7 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
       // Allocate new array
       const dtype = current ? current.dtype : array.dtype;
       // Special case colors, as we allow them to transform the shape
-      const shape = isColorMapModel(scale)
-        ? array.shape.slice(0, array.shape.length-1)
-        : array.shape;
+      const shape = array.shape;
       const newArray = arrayFrom(array, dtype, shape);
 
       let data = array.data as TypedArray;
