@@ -1,2 +1,5 @@
 [run]
 omit = ipyscales/tests/*
+
+[report]
+omit = ipyscales/tests/*
