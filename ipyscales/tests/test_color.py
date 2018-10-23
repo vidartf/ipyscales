@@ -8,7 +8,11 @@ import pytest
 
 from traitlets import TraitError
 
-from ..color import LinearColorScale, LogColorScale
+from ..color import (
+    LinearColorScale, LogColorScale, NamedSequentialColorMap,
+    NamedDivergingColorMap
+)
+from ..colorbar import ColorMapEditor
 
 
 def test_lincolorscale_creation_blank():
@@ -24,7 +28,12 @@ def test_lincolorscale_accepts_rgba():
         'rgb(0, 0, 0)', #rgb
         'rgb( 20,70,50 )', #rgb with spaces
         'rgba(10,10,10, 0.5)', #rgba with float
-        'rgba(255, 255, 255, 255)']) # alpha will be clamped to 1
+        'rgba(255, 255, 255, 255)'
+    ]) # alpha will be clamped to 1
+
+def test_lincolorscale_rejects_invalid_strings():
+    with pytest.raises(TraitError):
+        LinearColorScale(range=['foo', '#a5312'])
 
 def test_lincolorscale_rejects_floats():
     with pytest.raises(TraitError):
@@ -34,6 +43,53 @@ def test_lincolorscale_rejects_ints():
     with pytest.raises(TraitError):
         LinearColorScale(range=[1, 2])
 
+def test_lincolorscale_edit():
+    w = LinearColorScale()
+    editor = w.edit()
+    assert isinstance(editor, ColorMapEditor)
+    assert editor.colormap == w
+
+
 
 def test_logcolorscale_creation_blank():
     LogColorScale()
+
+def test_logcolorscale_edit():
+    w = LogColorScale()
+    editor = w.edit()
+    assert isinstance(editor, ColorMapEditor)
+    assert editor.colormap == w
+
+
+def test_named_sequential_colorscale_creation_blank():
+    NamedSequentialColorMap()
+
+def test_named_sequential_colorscale_creation_valid():
+    w = NamedSequentialColorMap('Rainbow')
+    assert w.name == 'Rainbow'
+
+def test_named_sequential_colorscale_creation_invalid():
+    with pytest.raises(TraitError):
+        NamedSequentialColorMap('Spectral')
+
+def test_named_sequential_colorscale_edit():
+    w = NamedSequentialColorMap()
+    editor = w.edit()
+    # just check that no exceptions are raised
+
+
+def test_named_diverging_colorscale_creation_blank():
+    NamedDivergingColorMap()
+
+def test_named_diverging_colorscale_creation_valid():
+    w = NamedDivergingColorMap('Spectral')
+    assert w.name == 'Spectral'
+
+def test_named_diverging_colorscale_creation_invalid():
+    with pytest.raises(TraitError):
+        NamedDivergingColorMap('Rainbow')
+
+def test_named_diverging_colorscale_edit():
+    w = NamedDivergingColorMap()
+    editor = w.edit()
+    # just check that no exceptions are raised

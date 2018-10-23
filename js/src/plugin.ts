@@ -19,7 +19,7 @@ import {
   IJupyterWidgetRegistry, ExportMap
 } from "@jupyter-widgets/base";
 
-import '../styles/plugin';
+import '../styles/plugin.css';
 
 
 const EXTENSION_ID = 'jupyter.extensions.jupyter-scales'

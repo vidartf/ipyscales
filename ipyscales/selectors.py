@@ -1,10 +1,20 @@
 
 
 from ipywidgets import Widget, DOMWidget, widget_serialization
-from traitlets import Dict, Instance, Unicode, Undefined
+from traitlets import (
+    Dict, Instance, Unicode, Undefined, validate, TraitError
+)
 
 from ._frontend import module_name, module_version
 from .traittypes import VarlenTuple
+
+
+def findvalue(array, value, compare = lambda x, y: x == y):
+    "A function that uses the compare function to return a value from the list."
+    try:
+        return next(x for x in array if compare(x, value))
+    except StopIteration:
+        raise ValueError('%r not in array'%value)
 
 
 class _SelectorBase(DOMWidget):
@@ -30,9 +40,16 @@ class StringDropdown(_SelectorBase):
     def __init__(self, options, value=Undefined, **kwargs):
         # Select the first item by default, if we can
         if value == Undefined:
-            nonempty = (len(options) > 0)
-            value = options[0] if nonempty else None
+            value = options[0] if options else None
         super(StringDropdown, self).__init__(options=options, value=value, **kwargs)
+
+    @validate('value')
+    def _validate_value(self, proposal):
+        value = proposal.value
+        try:
+            return findvalue(self.options, value) if value is not None else None
+        except ValueError:
+            raise TraitError('Invalid selection: value not found')
 
 
 class WidgetDropdown(_SelectorBase):
@@ -55,7 +72,14 @@ class WidgetDropdown(_SelectorBase):
 
     def __init__(self, options, value=Undefined, **kwargs):
         # Select the first item by default, if we can
-        if value == Undefined:
-            nonempty = (len(options) > 0)
-            value = tuple(options.values())[0] if nonempty else None
+        if value is Undefined and isinstance(options, dict):
+            value = tuple(options.values())[0] if options else None
         super(WidgetDropdown, self).__init__(options=options, value=value, **kwargs)
+
+    @validate('value')
+    def _validate_value(self, proposal):
+        value = proposal.value
+        try:
+            return findvalue(self.options.values(), value) if value is not None else None
+        except ValueError:
+            raise TraitError('Invalid selection: value not found')

@@ -46,7 +46,7 @@ class ColorBar(Base):
 
 @register
 class ColorMapEditor(Base):
-    """A color bar widget, representing a color map"""
+    """A color map editor widget"""
 
     _model_name = Unicode('ColorMapEditorModel').tag(sync=True)
     _view_name = Unicode('ColorMapEditorView').tag(sync=True)

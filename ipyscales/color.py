@@ -8,7 +8,7 @@
 Defines color scale widget, and any supporting functions
 """
 
-from traitlets import Float, Unicode, Bool, CaselessStrEnum
+from traitlets import Float, Unicode, Bool, CaselessStrEnum, Undefined
 from ipywidgets import register, jslink, VBox
 
 from .scale import Scale, SequentialScale, DivergingScale, OrdinalScale
@@ -111,7 +111,10 @@ class NamedSequentialColorMap(SequentialScale, ColorScale):
 
     name = CaselessStrEnum(seq_colormap_names, "Viridis").tag(sync=True)
 
-    def dashboard(self):
+    def __init__(self, name="Viridis", **kwargs):
+        super(NamedSequentialColorMap, self).__init__(name=name, **kwargs)
+
+    def edit(self):
         "Create linked widgets for this data."
         children = []
 
@@ -133,7 +136,10 @@ class NamedDivergingColorMap(DivergingScale, ColorScale):
 
     name = CaselessStrEnum(div_colormap_names, "BrBG").tag(sync=True)
 
-    def dashboard(self):
+    def __init__(self, name="BrBG", **kwargs):
+        super(NamedDivergingColorMap, self).__init__(name=name, **kwargs)
+
+    def edit(self):
         "Create linked widgets for this data."
         children = []
 
