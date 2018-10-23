@@ -16,5 +16,6 @@ The widgets have been embedded into the page for demonstrative purposes.
     :glob:
 
     introduction
+    colormaps
     colorbar
     scaled-data
