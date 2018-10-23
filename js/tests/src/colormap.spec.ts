@@ -189,7 +189,7 @@ describe('ColorScales', () => {
         expect(model).to.be.an(NamedDivergingColorMap);
         return model.initPromise.then(() => {
           expect(model.get('name')).to.be('BrBG');
-          expect(model.get('domain')).to.eql([0, 1]);
+          expect(model.get('domain')).to.eql([0, 0.5, 1]);
           expect(model.get('clamp')).to.be(false);
         });
     });
@@ -198,7 +198,7 @@ describe('ColorScales', () => {
         let model = createTestModel(NamedDivergingColorMap);
         expect(model).to.be.an(NamedDivergingColorMap);
         return model.initPromise.then(() => {
-          expect(model.obj.domain()).to.eql([0, 1]);
+          expect(model.obj.domain()).to.eql([0, 0.5, 1]);
           expect(model.obj.clamp()).to.be(false);
         });
     });
@@ -206,12 +206,12 @@ describe('ColorScales', () => {
     it('should be createable with non-default values', () => {
         let state = {
           name: 'PiYG',
-          domain: [-1e7, 1e5],
+          domain: [-1e7, 0, 1e5],
           clamp: true,
         };
         let model = createTestModel(NamedDivergingColorMap, state);
         return model.initPromise.then(() => {
-          expect(model.obj.domain()).to.eql([-1e7, 1e5]);
+          expect(model.obj.domain()).to.eql([-1e7, 0,  1e5]);
           expect(model.obj.clamp()).to.be(true);
           expect(colormapAsRGBAArray(model as any, 10)).to.eql([
             142, 1, 82, 1,

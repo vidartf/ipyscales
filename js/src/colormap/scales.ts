@@ -6,8 +6,13 @@ import {
 } from 'd3-color';
 
 import {
-  scaleSequential
+  scaleSequential, scaleDiverging
 } from 'd3-scale';
+
+// Polyfill missing typing for diverging scale:
+declare module "d3-scale" {
+  function scaleDiverging<Output>(interpolator: ((t: number) => Output)): ScaleSequential<Output>;
+}
 
 import * as d3Chromatic from 'd3-scale-chromatic';
 
@@ -129,8 +134,14 @@ export class NamedSequentialColorMap extends NamedColorMapBase {
 export class NamedDivergingColorMap extends NamedColorMapBase {
   defaults(): any {
     return {...super.defaults(),
-      name: 'BrBG'
+      name: 'BrBG',
+      domain: [0, 0.5, 1],
     };
+  }
+
+  constructObject() {
+    const interpolator = this.getInterpolatorFactory();
+    return scaleDiverging(interpolator);
   }
 
   static model_name = 'NamedDivergingColorMap';
@@ -139,7 +150,7 @@ export class NamedDivergingColorMap extends NamedColorMapBase {
 
 export interface ColorScale {
   copy(): this;
-  domain(domain: [number, number]): this;
+  domain(domain: number[]): this;
   (value: number | { valueOf(): number }): string;
 }
 
@@ -187,8 +198,18 @@ export function colormapAsRGBAArray(mapModel: ColorMapModel, data: number | Type
   } else {
     n = data.length / 4;
   }
-  const scale = mapModel.obj.copy().domain([0, n]);
-  for (let i=0; i<n; ++i) {
+  let scale;
+
+  let values = Array.from(new Array(n), (x,i) => i); // range(n)
+  if (mapModel instanceof NamedDivergingColorMap) {
+    scale = mapModel.obj.copy().domain([0, n/2, n]);
+  } else if (mapModel instanceof OrdinalScaleModel) {
+    scale = mapModel.obj;
+    values = scale.domain();
+  } else {
+    scale = mapModel.obj.copy().domain([0, n]);
+  }
+  for (let i of values) {
     const color = rgb(scale(i));
     data[i * 4 + 0] = color.r;
     data[i * 4 + 1] = color.g;
