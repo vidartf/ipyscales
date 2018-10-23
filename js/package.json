@@ -40,7 +40,7 @@
   "dependencies": {
     "@jupyter-widgets/base": "^1.1.10",
     "@phosphor/coreutils": "^1.3.0",
-    "chromabar": "^0.2.2",
+    "chromabar": "^0.2.3",
     "d3-interpolate": "^1.3.2",
     "d3-scale": "^2.1.2",
     "d3-scale-chromatic": "^1.3.3",

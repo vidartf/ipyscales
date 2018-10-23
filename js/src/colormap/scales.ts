@@ -6,8 +6,13 @@ import {
 } from 'd3-color';
 
 import {
-  scaleSequential
+  scaleSequential, scaleDiverging, scaleOrdinal
 } from 'd3-scale';
+
+// Polyfill missing typing for diverging scale:
+declare module "d3-scale" {
+  function scaleDiverging<Output>(interpolator: ((t: number) => Output)): ScaleSequential<Output>;
+}
 
 import * as d3Chromatic from 'd3-scale-chromatic';
 
@@ -19,7 +24,9 @@ import {
   LinearScaleModel, LogScaleModel
 } from '../continuous';
 
-import { SequentialScaleModel } from '../scale';
+import { SequentialScaleModel, OrdinalScaleModel } from '../scale';
+
+import { arrayEquals } from '../utils';
 
 
 /**
@@ -63,11 +70,23 @@ for (let key of Object.keys(d3Chromatic)) {
   }
 }
 
+const chromaticSchemeLut: {[key: string]: string[] | string[][]} = {};
+for (let key of Object.keys(d3Chromatic)) {
+  if (key.indexOf('scheme') === 0) {
+    const lowKey = key.slice('scheme'.length).toLowerCase();
+    chromaticSchemeLut[lowKey] = (d3Chromatic as any)[key];
+  }
+}
+
+function isFixedScheme(candidate: string[] | string[][]): candidate is string[] {
+  return candidate.length < 4 || !Array.isArray(candidate[3]);
+}
+
 
 /**
  * A contiguous color map created from a named color map.
  */
-class NamedColorMapBase extends SequentialScaleModel<string> {
+class NamedSequentialColorMapBase extends SequentialScaleModel<string> {
 
   getInterpolatorFactory(): ColorInterpolator {
     let name = this.get('name') as string;
@@ -113,7 +132,7 @@ class NamedColorMapBase extends SequentialScaleModel<string> {
 /**
  * A contiguous color map created from a named color map.
  */
-export class NamedSequentialColorMap extends NamedColorMapBase {
+export class NamedSequentialColorMap extends NamedSequentialColorMapBase {
   defaults(): any {
     return {...super.defaults(),
       name: 'Viridis'
@@ -126,20 +145,108 @@ export class NamedSequentialColorMap extends NamedColorMapBase {
 /**
  * A contiguous color map created from a named color map.
  */
-export class NamedDivergingColorMap extends NamedColorMapBase {
+export class NamedDivergingColorMap extends NamedSequentialColorMapBase {
   defaults(): any {
     return {...super.defaults(),
-      name: 'BrBG'
+      name: 'BrBG',
+      domain: [0, 0.5, 1],
     };
+  }
+
+  constructObject() {
+    const interpolator = this.getInterpolatorFactory();
+    return scaleDiverging(interpolator);
   }
 
   static model_name = 'NamedDivergingColorMap';
 }
 
 
+/**
+ * A contiguous color map created from a named color map.
+ */
+export class NamedOrdinalColorMap extends OrdinalScaleModel {
+  defaults(): any {
+    const def = {...super.defaults(),
+      name: 'Category10',
+      cardinality: 10,
+    };
+    delete def.range;
+    return def;
+  }
+
+  createPropertiesArrays() {
+    super.createPropertiesArrays();
+    this.simpleProperties.splice(
+      this.simpleProperties.indexOf('range'), 1
+    );
+  }
+
+  getScheme(): string[] {
+    const name = this.get('name') as string;
+    const scheme = chromaticSchemeLut[name.toLowerCase()];
+    if (!scheme) {
+      throw new Error(`Unknown scheme name: ${name}`);
+    }
+    if (isFixedScheme(scheme)) {
+      return scheme;
+    }
+    const cardinality = this.get('cardinality') as number;
+    return scheme[cardinality];
+  }
+
+  getSchemeName(): string | null {
+    const scheme = this.obj.range() as string[];
+    // Do a reverse lookup in d3Chromatic
+    const lut = d3Chromatic as any;
+    for (let key of Object.keys(lut)) {
+      let candidate = lut[key];
+      if (!candidate || !Array.isArray(candidate)) {
+        continue;
+      }
+      if (!isFixedScheme(candidate)) {
+        candidate = candidate[scheme.length];
+        if (!candidate) {
+          continue;
+        }
+      }
+      if (arrayEquals(scheme, candidate)) {
+        const name = key.replace(/^scheme/, '');
+        return name;
+      }
+    }
+    throw new Error(`Unknown color scheme name for range: ${scheme}`);
+  }
+
+  constructObject() {
+    const scheme = this.getScheme();
+    return scaleOrdinal(scheme);
+  }
+
+  /**
+   * Sync the model properties to the d3 object.
+   */
+  syncToObject() {
+    super.syncToObject();
+    const scheme = this.getScheme();
+    this.obj
+      .range(scheme);
+  }
+
+  syncToModel(toSet: Backbone.ObjectHash) {
+    toSet['name'] = this.getSchemeName();
+    super.syncToModel(toSet);
+  }
+
+  isColorScale = true;
+
+  static model_name = 'NamedOrdinalColorMap';
+}
+
+
 export interface ColorScale {
   copy(): this;
-  domain(domain: [number, number]): this;
+  domain(domain: number[]): this;
   (value: number | { valueOf(): number }): string;
 }
 
@@ -187,8 +294,18 @@ export function colormapAsRGBAArray(mapModel: ColorMapModel, data: number | Type
   } else {
     n = data.length / 4;
   }
-  const scale = mapModel.obj.copy().domain([0, n]);
-  for (let i=0; i<n; ++i) {
+  let scale;
+
+  let values = Array.from(new Array(n), (x,i) => i); // range(n)
+  if (mapModel instanceof NamedDivergingColorMap) {
+    scale = mapModel.obj.copy().domain([0, n/2, n]);
+  } else if (mapModel instanceof OrdinalScaleModel) {
+    scale = mapModel.obj;
+    values = scale.domain();
+  } else {
+    scale = mapModel.obj.copy().domain([0, n]);
+  }
+  for (let i of values) {
     const color = rgb(scale(i));
     data[i * 4 + 0] = color.r;
     data[i * 4 + 1] = color.g;

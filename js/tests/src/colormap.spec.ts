@@ -15,6 +15,7 @@ import {
   LinearColorScaleModel, LogColorScaleModel,
   NamedDivergingColorMap, NamedSequentialColorMap,
   colormapAsRGBArray, colormapAsRGBAArray,
+  NamedOrdinalColorMap
 } from '../../src/'
 
 
@@ -84,7 +85,7 @@ describe('ColorScales', () => {
         expect(model).to.be.an(LogColorScaleModel);
         return model.initPromise.then(() => {
           expect(model.get('range')).to.eql(['black', 'white']);
-          expect(model.get('domain')).to.eql([0, 1]);
+          expect(model.get('domain')).to.eql([1, 10]);
           expect(model.get('clamp')).to.be(false);
           expect(model.get('interpolator')).to.be('interpolate');
         });
@@ -95,7 +96,7 @@ describe('ColorScales', () => {
         expect(model).to.be.an(LogColorScaleModel);
         return model.initPromise.then(() => {
           expect(model.obj.range()).to.eql(['black', 'white']);
-          expect(model.obj.domain()).to.eql([0, 1]);
+          expect(model.get('domain')).to.eql([1, 10]);
           expect(model.obj.clamp()).to.be(false);
           expect(model.obj.interpolate()).to.be(interpolate);
         });
@@ -189,7 +190,7 @@ describe('ColorScales', () => {
         expect(model).to.be.an(NamedDivergingColorMap);
         return model.initPromise.then(() => {
           expect(model.get('name')).to.be('BrBG');
-          expect(model.get('domain')).to.eql([0, 1]);
+          expect(model.get('domain')).to.eql([0, 0.5, 1]);
           expect(model.get('clamp')).to.be(false);
         });
     });
@@ -198,7 +199,7 @@ describe('ColorScales', () => {
         let model = createTestModel(NamedDivergingColorMap);
         expect(model).to.be.an(NamedDivergingColorMap);
         return model.initPromise.then(() => {
-          expect(model.obj.domain()).to.eql([0, 1]);
+          expect(model.obj.domain()).to.eql([0, 0.5, 1]);
           expect(model.obj.clamp()).to.be(false);
         });
     });
@@ -206,12 +207,12 @@ describe('ColorScales', () => {
     it('should be createable with non-default values', () => {
         let state = {
           name: 'PiYG',
-          domain: [-1e7, 1e5],
+          domain: [-1e7, 0, 1e5],
           clamp: true,
         };
         let model = createTestModel(NamedDivergingColorMap, state);
         return model.initPromise.then(() => {
-          expect(model.obj.domain()).to.eql([-1e7, 1e5]);
+          expect(model.obj.domain()).to.eql([-1e7, 0,  1e5]);
           expect(model.obj.clamp()).to.be(true);
           expect(colormapAsRGBAArray(model as any, 10)).to.eql([
             142, 1, 82, 1,
@@ -225,6 +226,67 @@ describe('ColorScales', () => {
             128, 187, 71, 1,
             79, 145, 37, 1,
           ]);
+        });
+    });
+
+  });
+
+  describe('NamedOrdinalColorMap', () => {
+
+    it('should be createable', () => {
+        let model = createTestModel(NamedOrdinalColorMap);
+        expect(model).to.be.an(NamedOrdinalColorMap);
+        return model.initPromise.then(() => {
+          expect(typeof model.obj).to.be('function');
+        });
+    });
+
+    it('should have expected default values in model', () => {
+        let model = createTestModel(NamedOrdinalColorMap);
+        expect(model).to.be.an(NamedOrdinalColorMap);
+        return model.initPromise.then(() => {
+          expect(model.get('name')).to.be('Category10');
+          expect(model.get('cardinality')).to.be(10);
+          expect(model.get('domain')).to.eql([]);
+        });
+    });
+
+    it('should have expected default values in object', () => {
+        let model = createTestModel(NamedOrdinalColorMap);
+        expect(model).to.be.an(NamedOrdinalColorMap);
+        return model.initPromise.then(() => {
+          expect(model.obj.domain()).to.eql([]);
+          expect(model.obj.range().length).to.eql(10);
+        });
+    });
+
+    it('should be createable with non-default values', () => {
+        let state = {
+          name: 'PuBuGn',
+          domain: [-1e7, 1e5],
+          cardinality: 3,
+        };
+        let model = createTestModel(NamedOrdinalColorMap, state);
+        return model.initPromise.then(() => {
+          expect(model.obj.domain()).to.eql([-1e7, 1e5]);
+          expect(model.obj.range()).to.eql(['#ece2f0', '#a6bddb', '#1c9099']);
+        });
+    });
+
+    it('should throw an error for invalid name', () => {
+        let state = {
+          name: 'FooBar',
+        };
+        expect(createTestModel).withArgs(NamedOrdinalColorMap, state)
+          .to.throwError(/^Unknown scheme name: FooBar/);
+    });
+
+    it('should throw an error for unkown range', () => {
+        let model = createTestModel(NamedOrdinalColorMap);
+        return model.initPromise.then(() => {
+          model.obj.range(['#ffffff', '#000000']);
+          expect(model.syncToModel.bind(model)).withArgs({}).to.throwError(
+            /^Unknown color scheme name /);
         });
     });
 

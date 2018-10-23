@@ -10,7 +10,7 @@ from traitlets import TraitError
 
 from ..color import (
     LinearColorScale, LogColorScale, NamedSequentialColorMap,
-    NamedDivergingColorMap
+    NamedDivergingColorMap, NamedOrdinalColorMap
 )
 from ..colorbar import ColorMapEditor
 
@@ -93,3 +93,48 @@ def test_named_diverging_colorscale_edit():
     w = NamedDivergingColorMap()
     editor = w.edit()
     # just check that no exceptions are raised
+
+
+def test_named_ordinal_colorscale_creation_blank():
+    w = NamedOrdinalColorMap()
+    assert w.name == 'Category10'
+    assert w.cardinality == 10
+
+def test_named_ordinal_colorscale_creation_valid_fixed():
+    w = NamedOrdinalColorMap('Accent')
+    assert w.name == 'Accent'
+    assert w.cardinality == 8
+
+def test_named_ordinal_colorscale_creation_valid_free():
+    for i in range(3, 12):
+        w = NamedOrdinalColorMap('RdBu', i)
+        assert w.name == 'RdBu'
+        assert w.cardinality == i
+
+def test_named_ordinal_colorscale_creation_invalid_free():
+    with pytest.raises(TraitError):
+        NamedOrdinalColorMap('RdBu', 2)
+    with pytest.raises(TraitError):
+        NamedOrdinalColorMap('RdBu', 20)
+
+def test_named_ordinal_colorscale_creation_fixed_ignores():
+    w = NamedOrdinalColorMap('Accent', 25)
+    assert w.cardinality == 8
+
+def test_named_ordinal_colorscale_cardinality_changes():
+    w = NamedOrdinalColorMap('Accent', 25)
+    assert w.cardinality == 8
+    w.name = 'Category10'
+    assert w.cardinality == 10
+
+def test_named_ordinal_colorscale_cardinality_untouched():
+    w = NamedOrdinalColorMap('Accent', 25)
+    assert w.cardinality == 8
+    w.name = 'RdBu'
+    assert w.cardinality == 8
+
+def test_named_ordinal_colorscale_creation_invalid_name():
+    with pytest.raises(TraitError):
+        NamedOrdinalColorMap('Foobar')
+    with pytest.raises(TraitError):
+        NamedOrdinalColorMap('Viridis')

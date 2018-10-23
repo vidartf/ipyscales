@@ -53,6 +53,12 @@ class LogScale(ContinuousScale):
     """
     _model_name = Unicode('LogScaleModel').tag(sync=True)
 
+    domain = VarlenTuple(
+        trait=CFloat(),
+        default_value=(1., 10.),
+        minlen=2,
+    ).tag(sync=True)
+
     base = Float(10).tag(sync=True)
 
 @register

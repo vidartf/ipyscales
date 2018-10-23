@@ -117,7 +117,7 @@ describe('LogScaleModel', () => {
       expect(model).to.be.an(LogScaleModel);
       return model.initPromise.then(() => {
         expect(model.get('range')).to.eql([0, 1]);
-        expect(model.get('domain')).to.eql([0, 1]);
+        expect(model.get('domain')).to.eql([1, 10]);
         expect(model.get('clamp')).to.be(false);
         expect(model.get('interpolator')).to.be('interpolate');
         expect(model.get('base')).to.be(10);
@@ -129,7 +129,7 @@ describe('LogScaleModel', () => {
       expect(model).to.be.an(LogScaleModel);
       return model.initPromise.then(() => {
         expect(model.obj.range()).to.eql([0, 1]);
-        expect(model.obj.domain()).to.eql([0, 1]);
+        expect(model.get('domain')).to.eql([1, 10]);
         expect(model.obj.clamp()).to.be(false);
         expect(model.obj.interpolate()).to.be(interpolate);
         expect(model.obj.base()).to.be(10);
