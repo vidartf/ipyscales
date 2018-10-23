@@ -6,7 +6,7 @@ import {
 } from 'd3-color';
 
 import {
-  scaleSequential, scaleDiverging
+  scaleSequential, scaleDiverging, scaleOrdinal
 } from 'd3-scale';
 
 // Polyfill missing typing for diverging scale:
@@ -24,7 +24,9 @@ import {
   LinearScaleModel, LogScaleModel
 } from '../continuous';
 
-import { SequentialScaleModel } from '../scale';
+import { SequentialScaleModel, OrdinalScaleModel } from '../scale';
+
+import { arrayEquals } from '../utils';
 
 
 /**
@@ -68,11 +70,23 @@ for (let key of Object.keys(d3Chromatic)) {
   }
 }
 
+const chromaticSchemeLut: {[key: string]: string[] | string[][]} = {};
+for (let key of Object.keys(d3Chromatic)) {
+  if (key.indexOf('scheme') === 0) {
+    const lowKey = key.slice('scheme'.length).toLowerCase();
+    chromaticSchemeLut[lowKey] = (d3Chromatic as any)[key];
+  }
+}
+
+function isFixedScheme(candidate: string[] | string[][]): candidate is string[] {
+  return candidate.length < 4 || !Array.isArray(candidate[3]);
+}
+
 
 /**
  * A contiguous color map created from a named color map.
  */
-class NamedColorMapBase extends SequentialScaleModel<string> {
+class NamedSequentialColorMapBase extends SequentialScaleModel<string> {
 
   getInterpolatorFactory(): ColorInterpolator {
     let name = this.get('name') as string;
@@ -118,7 +132,7 @@ class NamedColorMapBase extends SequentialScaleModel<string> {
 /**
  * A contiguous color map created from a named color map.
  */
-export class NamedSequentialColorMap extends NamedColorMapBase {
+export class NamedSequentialColorMap extends NamedSequentialColorMapBase {
   defaults(): any {
     return {...super.defaults(),
       name: 'Viridis'
@@ -131,7 +145,7 @@ export class NamedSequentialColorMap extends NamedColorMapBase {
 /**
  * A contiguous color map created from a named color map.
  */
-export class NamedDivergingColorMap extends NamedColorMapBase {
+export class NamedDivergingColorMap extends NamedSequentialColorMapBase {
   defaults(): any {
     return {...super.defaults(),
       name: 'BrBG',
@@ -145,6 +159,88 @@ export class NamedDivergingColorMap extends NamedColorMapBase {
   }
 
   static model_name = 'NamedDivergingColorMap';
+}
+
+
+/**
+ * A contiguous color map created from a named color map.
+ */
+export class NamedOrdinalColorMap extends OrdinalScaleModel {
+  defaults(): any {
+    const def = {...super.defaults(),
+      name: 'Category10',
+      cardinality: 10,
+    };
+    delete def.range;
+    return def;
+  }
+
+  createPropertiesArrays() {
+    super.createPropertiesArrays();
+    this.simpleProperties.splice(
+      this.simpleProperties.indexOf('range'), 1
+    );
+  }
+
+  getScheme(): string[] {
+    const name = this.get('name') as string;
+    const scheme = chromaticSchemeLut[name.toLowerCase()];
+    if (!scheme) {
+      throw new Error(`Unknown scheme name: ${name}`);
+    }
+    if (isFixedScheme(scheme)) {
+      return scheme;
+    }
+    const cardinality = this.get('cardinality') as number;
+    return scheme[cardinality];
+  }
+
+  getSchemeName(): string | null {
+    const scheme = this.obj.range() as string[];
+    // Do a reverse lookup in d3Chromatic
+    const lut = d3Chromatic as any;
+    for (let key of Object.keys(lut)) {
+      let candidate = lut[key];
+      if (!candidate || !Array.isArray(candidate)) {
+        continue;
+      }
+      if (!isFixedScheme(candidate)) {
+        candidate = candidate[scheme.length];
+        if (!candidate) {
+          continue;
+        }
+      }
+      if (arrayEquals(scheme, candidate)) {
+        const name = key.replace(/^scheme/, '');
+        return name;
+      }
+    }
+    throw new Error(`Unknown color scheme name for range: ${scheme}`);
+  }
+
+  constructObject() {
+    const scheme = this.getScheme();
+    return scaleOrdinal(scheme);
+  }
+
+  /**
+   * Sync the model properties to the d3 object.
+   */
+  syncToObject() {
+    super.syncToObject();
+    const scheme = this.getScheme();
+    this.obj
+      .range(scheme);
+  }
+
+  syncToModel(toSet: Backbone.ObjectHash) {
+    toSet['name'] = this.getSchemeName();
+    super.syncToModel(toSet);
+  }
+
+  isColorScale = true;
+
+  static model_name = 'NamedOrdinalColorMap';
 }
 
 

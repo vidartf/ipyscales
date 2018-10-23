@@ -17,6 +17,7 @@ from .continuous import (
 from .color import (
     ColorScale, LinearColorScale, LogColorScale,
     NamedSequentialColorMap, NamedDivergingColorMap,
+    NamedOrdinalColorMap
 )
 from .colorbar import ColorBar, ColorMapEditor
 
