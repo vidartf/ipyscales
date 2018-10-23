@@ -11,7 +11,7 @@ const externals = ['@jupyter-widgets/base'];
 
 module.exports = [
   {
-    entry: './src/index.ts',
+    entry: './src/extension.ts',
     output: {
       filename: 'index.js',
       path: __dirname + '/../ipyscales/nbextension/static',
