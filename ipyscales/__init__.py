@@ -13,6 +13,7 @@ from .scale import (
 )
 from .continuous import (
     ContinuousScale, LinearScale, LogScale, PowScale,
+    ContinuousScaleEditor
 )
 from .color import (
     ColorScale, LinearColorScale, LogColorScale,

@@ -5,6 +5,7 @@ const version = require('./package.json').version;
 const rules = [
   { test: /\.ts$/, loader: 'ts-loader' },
   { test: /\.js$/, loader: "source-map-loader" },
+  { test: /\.css$/, use: ['style-loader', 'css-loader']}
 ];
 
 const externals = ['@jupyter-widgets/base'];

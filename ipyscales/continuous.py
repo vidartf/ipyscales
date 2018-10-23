@@ -8,9 +8,10 @@
 Defines linear scale widget, and any supporting functions
 """
 
-from traitlets import Float, CFloat, Unicode, List, Union, Bool, Any
-from ipywidgets import Color, register
+from traitlets import Float, CFloat, Unicode, List, Union, Bool, Any, Instance
+from ipywidgets import Color, register, DOMWidget, widget_serialization
 
+from ._frontend import module_name, module_version
 from .scale import Scale
 from .traittypes import VarlenTuple
 
@@ -32,6 +33,9 @@ class ContinuousScale(Scale):
 
     interpolator = Unicode('interpolate').tag(sync=True)
     clamp = Bool(False).tag(sync=True)
+
+    def edit(self):
+        return ContinuousScaleEditor(scale=self)
 
 
 @register
@@ -65,3 +69,18 @@ class PowScale(ContinuousScale):
     _model_name = Unicode('PowScaleModel').tag(sync=True)
 
     exponent = Float(1).tag(sync=True)
+
+
+
+@register
+class ContinuousScaleEditor(DOMWidget):
+    """A continuous scale editor widget"""
+
+    _model_name = Unicode('ContinuousScaleEditorModel').tag(sync=True)
+    _view_name = Unicode('ContinuousScaleEditorView').tag(sync=True)
+    _model_module = Unicode(module_name).tag(sync=True)
+    _model_module_version = Unicode(module_version).tag(sync=True)
+    _view_module = Unicode(module_name).tag(sync=True)
+    _view_module_version = Unicode(module_version).tag(sync=True)
+
+    scale = Instance(ContinuousScale, allow_none=False).tag(sync=True, **widget_serialization)

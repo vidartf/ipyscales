@@ -3,8 +3,11 @@
 
 export * from './scale';
 export * from './continuous';
+export * from './continuous-editor';
 export * from './colormap';
 export * from './datawidgets';
 export * from './selectors';
+
+import '../styles/index.css'
 
 export { version } from './version';

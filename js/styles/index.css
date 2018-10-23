@@ -1,0 +1,35 @@
+
+.jupyterContinuousEditor {
+  display: flex
+}
+
+.jupyterContinuousEditor svg path.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.jupyterContinuousEditor svg path.points {
+  fill: lightblue;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.jupyterContinuousEditor div {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: repeat(auto-fill, 3em);
+  padding: 0 4px;
+}
+
+.jupyterContinuousEditor span {
+  padding: 2px;
+}
+
+.jupyterContinuousEditor label {
+  margin-right: 8px;
+}
+
+.jupyterContinuousEditor input {
+  width: 150px;
+}
