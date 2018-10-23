@@ -84,7 +84,7 @@ describe('ColorScales', () => {
         expect(model).to.be.an(LogColorScaleModel);
         return model.initPromise.then(() => {
           expect(model.get('range')).to.eql(['black', 'white']);
-          expect(model.get('domain')).to.eql([0, 1]);
+          expect(model.get('domain')).to.eql([1, 10]);
           expect(model.get('clamp')).to.be(false);
           expect(model.get('interpolator')).to.be('interpolate');
         });
@@ -95,7 +95,7 @@ describe('ColorScales', () => {
         expect(model).to.be.an(LogColorScaleModel);
         return model.initPromise.then(() => {
           expect(model.obj.range()).to.eql(['black', 'white']);
-          expect(model.obj.domain()).to.eql([0, 1]);
+          expect(model.get('domain')).to.eql([1, 10]);
           expect(model.obj.clamp()).to.be(false);
           expect(model.obj.interpolate()).to.be(interpolate);
         });

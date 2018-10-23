@@ -108,6 +108,7 @@ class LogScaleModel extends ContinuousScaleModel {
   defaults() {
     return {...super.defaults(),
       base: 10,
+      domain: [1, 10],
     };
   }
 
