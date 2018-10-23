@@ -14,7 +14,8 @@ module.exports = function (config) {
       { pattern: "src/**/*.ts" }
     ],
     exclude: [
-      "src/plugin.ts"
+      "src/plugin.ts",
+      "src/extension.ts",
     ],
     preprocessors: {
       '**/*.ts': ['karma-typescript']
