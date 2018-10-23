@@ -4,6 +4,8 @@
 # Copyright (c) Vidar Tonaas Fauske.
 # Distributed under the terms of the Modified BSD License.
 
+from collections import OrderedDict
+
 import pytest
 
 from ipywidgets import Widget
@@ -41,7 +43,9 @@ B = Widget()
 C = Widget()
 
 def test_widgetsel_creation():
-    w = WidgetDropdown(dict(A=A, B=B, C=C))
+    # Works after python 3.7:
+    #w = WidgetDropdown(dict(A=A, B=B, C=C))
+    w = WidgetDropdown(OrderedDict([('A', A), ('B', B), ('C', C)]))
     assert w.value == A
 
 def test_widgetsel_valid_change():

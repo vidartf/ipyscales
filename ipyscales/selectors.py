@@ -40,8 +40,7 @@ class StringDropdown(_SelectorBase):
     def __init__(self, options, value=Undefined, **kwargs):
         # Select the first item by default, if we can
         if value == Undefined:
-            nonempty = (len(options) > 0)
-            value = options[0] if nonempty else None
+            value = options[0] if options else None
         super(StringDropdown, self).__init__(options=options, value=value, **kwargs)
 
     @validate('value')
@@ -73,9 +72,8 @@ class WidgetDropdown(_SelectorBase):
 
     def __init__(self, options, value=Undefined, **kwargs):
         # Select the first item by default, if we can
-        if value == Undefined:
-            nonempty = (len(options) > 0)
-            value = tuple(options.values())[0] if nonempty else None
+        if value is Undefined and isinstance(options, dict):
+            value = tuple(options.values())[0] if options else None
         super(WidgetDropdown, self).__init__(options=options, value=value, **kwargs)
 
     @validate('value')
