@@ -55,6 +55,6 @@ script:
       npm test || EXIT_STATUS=$?
       popd
     fi
-    exit $EXIT_STATUS
+    (exit $EXIT_STATUS)
 after_success:
-    - codecov
+  - codecov
