@@ -395,6 +395,14 @@ export class OrdinalScaleModel extends ScaleModel {
 
   static serializers = {
     ...ScaleModel.serializers,
+    unknown: {
+      deserialize: (value?: any, manager?: ManagerBase<any>) => {
+        return value === null ? undefined : value
+      },
+      serialize: (value?: any, widget?: WidgetModel) => {
+        return value === undefined ? null : value
+      },
+    }
   }
 
   static model_name = 'OrdinalScaleModel';
