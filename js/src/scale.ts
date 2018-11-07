@@ -357,7 +357,7 @@ export class OrdinalScaleModel extends ScaleModel {
     return {...super.defaults(),
       domain: [],
       range: [],
-      unknown: undefined,
+      unknown: scaleImplicit,
     };
   }
 
@@ -366,29 +366,12 @@ export class OrdinalScaleModel extends ScaleModel {
     this.simpleProperties.push(
       'domain',
       'range',
+      'unknown',
     );
   }
 
   constructObject() {
     return scaleOrdinal();
-  }
-
-  syncToObject() {
-    super.syncToObject();
-    let unknown = this.get('unknown');
-    if (unknown === undefined) {
-      unknown = scaleImplicit;
-    }
-    this.obj.unknown(unknown);
-  }
-
-  syncToModel(toSet: Backbone.ObjectHash) {
-    let unknown = this.obj.unknown();
-    if (unknown === scaleImplicit) {
-      unknown = undefined;
-    }
-    toSet['unknown'] = unknown;
-    super.syncToModel(toSet);
   }
 
   obj: ScaleOrdinal<any, any>;
@@ -397,10 +380,18 @@ export class OrdinalScaleModel extends ScaleModel {
     ...ScaleModel.serializers,
     unknown: {
       deserialize: (value?: any, manager?: ManagerBase<any>) => {
-        return value === null ? undefined : value
+        return value === '__implicit'
+          ? scaleImplicit
+          : value === null
+            ? undefined
+            : value;
       },
       serialize: (value?: any, widget?: WidgetModel) => {
-        return value === undefined ? null : value
+        return value === scaleImplicit
+          ? '__implicit'
+          : value === undefined
+            ? null
+            : value;
       },
     }
   }
