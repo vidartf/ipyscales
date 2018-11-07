@@ -265,7 +265,7 @@ describe('OrdinalScaleModel', () => {
     return model.initPromise.then(() => {
       expect(model.get('range')).to.eql([]);
       expect(model.get('domain')).to.eql([]);
-      expect(model.get('unknown')).to.be(undefined);
+      expect(model.get('unknown')).to.be(scaleImplicit);
     });
   });
 
