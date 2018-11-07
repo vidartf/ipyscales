@@ -6,7 +6,7 @@ import {
 } from '@jupyter-widgets/base';
 
 import {
-  chromaEditor
+  chromaEditor, ChromaEditor
 } from 'chromabar';
 
 
@@ -36,6 +36,7 @@ class ColorMapEditorModel extends DOMWidgetModel {
       orientation: 'horizontal',
       length: 300,
       breadth: 30,
+      padding: 5,
       border_thickness: 1,
     };
   }
@@ -91,19 +92,8 @@ class ColorMapEditorModel extends DOMWidgetModel {
 export
 class ColorMapEditorView extends DOMWidgetView {
   render() {
-    this.onChange();
-    this.model.on('change', this.onChange, this);
-    this.model.on('childchange', this.onChange, this);
-  }
-
-  onChange() {
     const cmModel = this.model.get('colormap') as ScaleModel;
-    const horizontal = this.model.get('orientation') === 'horizontal';
-    const editorFn = chromaEditor(cmModel.obj)
-      .orientation(this.model.get('orientation'))
-      .barLength(this.model.get('length'))
-      .breadth(this.model.get('breadth'))
-      .borderThickness(this.model.get('border_thickness'))
+    this.editorFn = chromaEditor(cmModel.obj)
       .onUpdate((save: boolean) => {
         // Sync back all changes to both server and here
         cmModel.syncToModel({});
@@ -111,21 +101,31 @@ class ColorMapEditorView extends DOMWidgetView {
           cmModel.save_changes();
         }
       });
+
+    this.onChange();
+    this.model.on('change', this.tick, this);
+    this.model.on('childchange', this.tick, this);
+  }
+
+  tick() {
+    requestAnimationFrame(this.onChange.bind(this));
+  }
+
+  onChange() {
+    const cmModel = this.model.get('colormap') as ScaleModel;
+    this.editorFn
+      .orientation(this.model.get('orientation'))
+      .barLength(this.model.get('length'))
+      .breadth(this.model.get('breadth'))
+      .padding(this.model.get('padding'))
+      .borderThickness(this.model.get('border_thickness'));
     let svg = select(this.el)
       .selectAll<SVGSVGElement, null>('svg.jupyterColorbar').data([null]);
     svg = svg.merge(svg.enter().append<SVGSVGElement>('svg')
       .attr('class', 'jupyterColorbar'));
     svg
-      .attr('height', editorFn.minHeight() + (horizontal ? 20 : 10))
-      .attr('width', editorFn.minWidth() + (horizontal ? 10 : 20));
-    let g = svg.selectAll<SVGGElement, null>('g').data([null]);
-    g = g.merge(g.enter().append('g'));
-    g
-      .attr('transform', `translate(${
-        horizontal ? 10 : 5
-      }, ${
-        horizontal ? 5 : 10
-      })`)
-      .call(editorFn);
+      .call(this.editorFn);
   }
+
+  editorFn: ChromaEditor;
 }

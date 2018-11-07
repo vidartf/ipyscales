@@ -26,6 +26,7 @@ class Base(DOMWidget):
 
     breadth = Int(30, min=1).tag(sync=True)
     border_thickness = Float(1.0).tag(sync=True)
+    padding = Int(5).tag(sync=True)
 
 
 @register
@@ -40,8 +41,8 @@ class ColorBar(Base):
 
     length = Int(100, min=2).tag(sync=True)
     title = Unicode(None, allow_none=True).tag(sync=True)
-    title_padding = Int(30).tag(sync=True)
-    axis_padding = Int(None, allow_none=True).tag(sync=True)
+    title_padding = Int(0).tag(sync=True)
+    axis_padding = Int(0).tag(sync=True)
 
 
 @register
