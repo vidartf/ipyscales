@@ -113,6 +113,26 @@ class TresholdScale(Scale):
     ).tag(sync=True)
 
 
+
+def serialize_unkown(value, widget):
+    if value is OrdinalScale.scaleImplicit:
+        return '__implicit'
+    return value
+
+def deserialize_unkown(value, widget):
+    if value == '__implicit':
+        return OrdinalScale.scaleImplicit
+    return value
+
+unknown_serializers = {
+    'serialize': serialize_unkown,
+    'deserialize': deserialize_unkown
+}
+
+
+scaleImplicit = object()
+
+
 @register
 class OrdinalScale(Scale):
     """An ordinal scale widget.
@@ -132,4 +152,8 @@ class OrdinalScale(Scale):
         minlen=0,
     ).tag(sync=True)
 
-    unknown = Any(Undefined).tag(sync=True)
+    unknown = Any(scaleImplicit, allow_none=True).tag(
+        sync=True, **unknown_serializers
+    )
+
+

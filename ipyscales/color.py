@@ -216,3 +216,16 @@ class NamedOrdinalColorMap(OrdinalScale, ColorScale):
 
     # Range is fixed by colormap name:
     range = None
+
+    def edit(self):
+        "Create linked widgets for this data."
+        children = []
+
+        w = StringDropdown(
+            value=self.name,
+            options=NamedOrdinalColorMap.name.values,
+            description="Name")
+        jslink((self, "name"), (w, "value"))
+        children.append(w)
+
+        return VBox(children=children)
