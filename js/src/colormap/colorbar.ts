@@ -5,8 +5,10 @@ import {
   DOMWidgetModel, DOMWidgetView, ISerializers, WidgetModel, unpack_models
 } from '@jupyter-widgets/base';
 
+import { Message } from '@phosphor/messaging';
+
 import {
-  chromabar
+  chromabar, ChromaBar
 } from 'chromabar';
 
 import { select } from 'd3-selection';
@@ -16,8 +18,7 @@ import {
 } from '../version';
 
 
-export
-class ColorBarModel extends DOMWidgetModel {
+export class ColorBarModel extends DOMWidgetModel {
   defaults() {
     return {...super.defaults(),
       _model_name: ColorBarModel.model_name,
@@ -34,8 +35,9 @@ class ColorBarModel extends DOMWidgetModel {
       breadth: 30,
       border_thickness: 1,
       title: null,
-      title_padding: 30,
-      axis_padding: null,
+      padding: 5,
+      title_padding: 0,
+      axis_padding: 0,
     };
   }
 
@@ -87,37 +89,46 @@ class ColorBarModel extends DOMWidgetModel {
 }
 
 
-export
-class ColorBarView extends DOMWidgetView {
+export class ColorBarView extends DOMWidgetView {
   render() {
+    const cmModel = this.model.get('colormap');
+    this.barFunc = chromabar(cmModel.obj);
+
     this.onChange();
     this.model.on('change', this.onChange, this);
     this.model.on('childchange', this.onChange, this);
   }
 
+  processPhosphorMessage(msg: Message) {
+    super.processPhosphorMessage.call(this, msg);
+    switch (msg.type) {
+    case 'after-attach':
+      // Auto-sizing should be updated when attached to DOM:
+      this.onChange();
+      break;
+    }
+  }
+
   onChange() {
-    const cmModel = this.model.get('colormap');
-    const horizontal = this.model.get('orientation') === 'horizontal';
-    const barFunc = chromabar(cmModel.obj)
+    // Sync config:
+    this.barFunc
       .orientation(this.model.get('orientation'))
       .side(this.model.get('side'))
       .barLength(this.model.get('length'))
       .breadth(this.model.get('breadth'))
       .borderThickness(this.model.get('border_thickness'))
       .title(this.model.get('title'))
+      .padding(this.model.get('padding'))
       .titlePadding(this.model.get('title_padding'))
       .axisPadding(this.model.get('axis_padding'));
+
+    // Update DOM:
     let svg = select(this.el)
       .selectAll<SVGSVGElement, null>('svg.jupyterColorbar').data([null]);
     svg = svg.merge(svg.enter().append<SVGSVGElement>('svg')
-      .attr('class', 'jupyterColorbar'));
-    svg
-      .attr('height', barFunc.minHeight() + 10)
-      .attr('width', barFunc.minWidth() + (horizontal ? 30 : 10));
-    let g = svg.selectAll<SVGGElement, null>('g').data([null]);
-    g = g.merge(g.enter().append('g'));
-    g
-      .attr('transform', 'translate(5, 5)')
-      .call(barFunc);
+      .attr('class', 'jupyterColorbar'))
+      .call(this.barFunc);
   }
+
+  barFunc: ChromaBar;
 }
