@@ -115,18 +115,18 @@ class TresholdScale(Scale):
 
 
 def serialize_unkown(value, widget):
-    if value is OrdinalScale.scaleImplicit:
+    if value is scaleImplicit:
         return '__implicit'
     return value
 
 def deserialize_unkown(value, widget):
     if value == '__implicit':
-        return OrdinalScale.scaleImplicit
+        return scaleImplicit
     return value
 
 unknown_serializers = {
-    'serialize': serialize_unkown,
-    'deserialize': deserialize_unkown
+    'to_json': serialize_unkown,
+    'from_json': deserialize_unkown
 }
 
 
