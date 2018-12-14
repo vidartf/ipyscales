@@ -15,8 +15,9 @@ import {
   LinearColorScaleModel, LogColorScaleModel,
   NamedDivergingColorMap, NamedSequentialColorMap,
   colormapAsRGBArray, colormapAsRGBAArray,
-  NamedOrdinalColorMap
+  NamedOrdinalColorMap, ArrayColorScaleModel, isColorMapModel
 } from '../../src/'
+import ndarray = require('ndarray');
 
 
 describe('ColorScales', () => {
@@ -215,16 +216,16 @@ describe('ColorScales', () => {
           expect(model.obj.domain()).to.eql([-1e7, 0,  1e5]);
           expect(model.obj.clamp()).to.be(true);
           expect(colormapAsRGBAArray(model as any, 10)).to.eql([
-            142, 1, 82, 1,
-            192, 38, 126, 1,
-            221, 114, 173, 1,
-            240, 179, 214, 1,
-            250, 221, 237, 1,
-            245, 243, 239, 1,
-            225, 242, 202, 1,
-            182, 222, 135, 1,
-            128, 187, 71, 1,
-            79, 145, 37, 1,
+            142, 1, 82, 255,
+            192, 38, 126, 255,
+            221, 114, 173, 255,
+            240, 179, 214, 255,
+            250, 221, 237, 255,
+            245, 243, 239, 255,
+            225, 242, 202, 255,
+            182, 222, 135, 255,
+            128, 187, 71, 255,
+            79, 145, 37, 255,
           ]);
         });
     });
@@ -287,6 +288,81 @@ describe('ColorScales', () => {
           model.obj.range(['#ffffff', '#000000']);
           expect(model.syncToModel.bind(model)).withArgs({}).to.throwError(
             /^Unknown color scheme name /);
+        });
+    });
+
+  });
+
+  describe('ArrayColorScaleModel', () => {
+
+    it('should be createable', () => {
+        let model = createTestModel(ArrayColorScaleModel);
+        expect(model).to.be.an(ArrayColorScaleModel);
+        return model.initPromise.then(() => {
+          expect(typeof model.obj).to.be('function');
+        });
+    });
+
+    it('should have expected default values in model', () => {
+        let model = createTestModel(ArrayColorScaleModel);
+        expect(model).to.be.an(ArrayColorScaleModel);
+        return model.initPromise.then(() => {
+          const colors = model.get('colors');
+          expect(colors.shape).to.eql([2, 3]);
+          expect(colors.data).to.eql([0, 0, 0, 1, 1, 1]);
+          expect(model.get('space')).to.be('rgb');
+          expect(model.get('gamma')).to.be(1.0);
+          expect(model.get('domain')).to.eql([0, 1]);
+          expect(model.get('clamp')).to.be(false);
+          expect(model.isColorScale).to.be(true);
+        });
+    });
+
+    it('should have expected default values in object', () => {
+        let model = createTestModel(ArrayColorScaleModel);
+        expect(model).to.be.an(ArrayColorScaleModel);
+        return model.initPromise.then(() => {
+          expect(model.obj.domain()).to.eql([0, 1]);
+          expect(model.obj.clamp()).to.be(false);
+        });
+    });
+
+    it('should update in object on change', () => {
+        let model = createTestModel(ArrayColorScaleModel);
+        expect(model).to.be.an(ArrayColorScaleModel);
+        return model.initPromise.then(() => {
+          model.set('colors', ndarray(new Float32Array([1, 1, 1, 0, 0, 0]), [2, 3]));
+          expect(model.obj.interpolator()(1)).to.be('rgb(0, 0, 0)');
+          model.set('space', 'hsl');
+          expect(model.obj.interpolator()(0)).to.be('rgb(255, 255, 255)');
+          expect(model.obj.interpolator()(1)).to.be('rgb(0, 0, 0)');
+        });
+    });
+
+    it('should be createable with non-default values', () => {
+        let state = {
+          colors: ndarray(new Float32Array([
+            0.5, 0.5, 0.5, 0.5,
+            1.0, 1.0, 0.0, 1.0,
+            0.0, 0.0, 0.0, 0.0,
+          ]), [3, 4]),
+          domain: [-1e7, 1e5],
+          clamp: true,
+          gamma: 2.2
+        };
+        let model = createTestModel(ArrayColorScaleModel, state);
+        return model.initPromise.then(() => {
+          expect(model.obj.domain()).to.eql([-1e7, 1e5]);
+          expect(model.obj.clamp()).to.be(true);
+          expect(colormapAsRGBAArray(model as any, 7)).to.eql([
+            128, 128, 128, 128,
+            182, 182, 106, 170,
+            222, 222, 77, 212,
+            255, 255, 0, 255,
+            212, 212, 0, 170,
+            155, 155, 0, 85,
+            0, 0, 0, 0,
+          ]);
         });
     });
 

@@ -2,11 +2,15 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  rgb
+  rgb, hsl
 } from 'd3-color';
 
 import {
-  scaleSequential, scaleDiverging, scaleOrdinal
+  interpolateRgb, interpolateHsl, piecewise
+} from 'd3-interpolate';
+
+import {
+  scaleSequential, scaleDiverging, scaleOrdinal,
 } from 'd3-scale';
 
 // Polyfill missing typing for diverging scale:
@@ -17,8 +21,10 @@ declare module "d3-scale" {
 import * as d3Chromatic from 'd3-scale-chromatic';
 
 import {
-  TypedArray
+  TypedArray, data_union_array_serialization
 } from 'jupyter-dataserializers';
+
+import * as ndarray from 'ndarray';
 
 import {
   LinearScaleModel, LogScaleModel
@@ -41,7 +47,6 @@ export class LinearColorScaleModel extends LinearScaleModel {
 
   isColorScale = true;
 
-  static model_name = 'LinearColorScaleModel';
 }
 
 /**
@@ -57,6 +62,78 @@ export class LogColorScaleModel extends LogScaleModel {
   isColorScale = true;
 
   static model_name = 'LogColorScaleModel';
+}
+
+
+export class ArrayColorScaleModel extends SequentialScaleModel<string> {
+
+  isColorScale = true;
+
+  defaults(): any {
+    return {...super.defaults(),
+      colors: ndarray(new Float32Array([0, 0, 0, 1, 1, 1]), [2, 3]),
+      space: 'rgb',
+      gamma: 1.0,
+    };
+  }
+
+  createInterpolator(): (t: number) => any {
+    const space = this.get('space') as string;
+    const colors = this.get('colors') as ndarray;
+    const factory = space === 'hsl' ? hsl : rgb;
+    const spaceColors = [];
+    const alpha = colors.shape[1] > 3;
+    if (space === 'hsl') {
+      for (let i = 0; i < colors.shape[0]; ++i) {
+        spaceColors.push(factory(
+          360 * colors.get(i, 0),
+          colors.get(i, 1),
+          colors.get(i, 2),
+          alpha ? colors.get(i, 3) : 1.0
+        ));
+      }
+      return piecewise(interpolateHsl, spaceColors);
+    }
+
+    for (let i = 0; i < colors.shape[0]; ++i) {
+      spaceColors.push(factory(
+        255 * colors.get(i, 0),
+        255 * colors.get(i, 1),
+        255 * colors.get(i, 2),
+        alpha ? colors.get(i, 3) : 1.0
+      ));
+    }
+    let gamma = this.get('gamma');
+    if (gamma === undefined || gamma === null) {
+      gamma = 1.0;
+    }
+    return piecewise(interpolateRgb.gamma(gamma), spaceColors);
+  }
+
+  syncToObject() {
+    super.syncToObject();
+    const interpProps = ['colors', 'space', 'gamma'];
+    const interpChange = interpProps.some(prop => this.hasChanged(prop));
+    if (interpChange) {
+      this.obj.interpolator(this.createInterpolator());
+    }
+  }
+
+  /**
+   * Create the wrapped d3-scale scaleLinear object
+   */
+  constructObject(): any {
+    return scaleSequential(this.createInterpolator());
+  }
+
+  protected colorInterp: ((t: number) => string) | null = null;
+
+  static model_name = 'ArrayColorScaleModel';
+
+  static serializers = {
+    ...SequentialScaleModel.serializers,
+    colors: data_union_array_serialization,
+  }
 }
 
 
@@ -303,14 +380,14 @@ export function colormapAsRGBAArray(mapModel: ColorMapModel, data: number | Type
     scale = mapModel.obj;
     values = scale.domain();
   } else {
-    scale = mapModel.obj.copy().domain([0, n]);
+    scale = mapModel.obj.copy().domain([0, n - 1]);
   }
   for (let i of values) {
     const color = rgb(scale(i));
     data[i * 4 + 0] = color.r;
     data[i * 4 + 1] = color.g;
     data[i * 4 + 2] = color.b;
-    data[i * 4 + 3] = color.opacity;
+    data[i * 4 + 3] = 255 * color.opacity;
   }
 
   return data;
