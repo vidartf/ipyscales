@@ -21,8 +21,7 @@ import {
 } from '../scale'
 
 
-export
-class ColorMapEditorModel extends DOMWidgetModel {
+export class ColorMapEditorModel extends DOMWidgetModel {
   defaults() {
     return {...super.defaults(),
       _model_name: ColorMapEditorModel.model_name,
@@ -89,8 +88,7 @@ class ColorMapEditorModel extends DOMWidgetModel {
 }
 
 
-export
-class ColorMapEditorView extends DOMWidgetView {
+export class ColorMapEditorView extends DOMWidgetView {
   render() {
     const cmModel = this.model.get('colormap') as ScaleModel;
     this.editorFn = chromaEditor(cmModel.obj)
@@ -112,7 +110,6 @@ class ColorMapEditorView extends DOMWidgetView {
   }
 
   onChange() {
-    const cmModel = this.model.get('colormap') as ScaleModel;
     this.editorFn
       .orientation(this.model.get('orientation'))
       .barLength(this.model.get('length'))
