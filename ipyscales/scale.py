@@ -5,7 +5,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 """
-Defiens a scale widget base class, and any supporting functions
+Defines a scale widget base class, and any supporting functions
 """
 
 from ipywidgets import Widget, register

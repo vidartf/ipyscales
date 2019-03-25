@@ -110,7 +110,7 @@ export interface Constructor<T> {
 export function createTestModel<T extends widgets.WidgetModel>(
   constructor: Constructor<T>,
   attributes?: any,
-  widget_manager?: DummyManager,
+  widget_manager?: widgets.WidgetModel['widget_manager'],
 ): T {
 
   let id = widgets.uuid();

@@ -11,7 +11,7 @@ import {
 
 import {
   data_union_serialization, listenToUnion,
-  TypedArray, typesToArray, TypedArrayConstructor,
+  TypedArray, typesToArray,
   ISerializers, getArray, IDataWriteBack, setArray
 } from 'jupyter-dataserializers';
 
@@ -327,7 +327,7 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
       ...DataModel.serializers,
       data: data_union_serialization,
       scale: { deserialize: unpack_models },
-      scaledData: {serialize: undefSerializer},
+      scaledData: { serialize: undefSerializer },
     };
 
   static model_name = 'ScaledArrayModel';

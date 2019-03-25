@@ -77,7 +77,7 @@ export class ColorBarModel extends DOMWidgetModel {
 
   static serializers: ISerializers = {
       ...DOMWidgetModel.serializers,
-      colormap: {deserialize: unpack_models}
+      colormap: { deserialize: unpack_models }
     }
 
   static model_name = 'ColorBarModel';
