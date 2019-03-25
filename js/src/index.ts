@@ -6,5 +6,6 @@ export * from './continuous';
 export * from './colormap';
 export * from './datawidgets';
 export * from './selectors';
+export * from './value';
 
 export { version } from './version';
