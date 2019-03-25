@@ -1,6 +1,11 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
+import {
+  WidgetModel
+} from '@jupyter-widgets/base';
+
+
 export function arrayEquals(a: unknown[], b: unknown[]): boolean {
   if (a.length !== b.length) return false;
   const al = a.length;
@@ -48,4 +53,11 @@ export function parseCssColor(color: string): [number, number, number, number] {
     ];
   }
   throw new Error(`Invalid CSS color: "${color}"`);
+}
+
+/**
+ * Serializer that prevents syncing to kernel
+ */
+export function undefSerializer(obj: any, widget?: WidgetModel): undefined {
+  return undefined;
 }

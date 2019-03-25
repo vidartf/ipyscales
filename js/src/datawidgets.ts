@@ -32,19 +32,11 @@ import {
 } from './version';
 
 import {
-  parseCssColor
+  parseCssColor, undefSerializer
 } from './utils';
 
 
 import ndarray = require('ndarray');
-
-
-/**
- * Serializer that prevents syncing to kernel
- */
-function undefSerializer(obj: any, widget?: WidgetModel): undefined {
-  return undefined;
-}
 
 
 /**
