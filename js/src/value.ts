@@ -110,6 +110,7 @@ export class ScaledValueModel extends WidgetModel {
       if (currModel) {
         this.listenTo(currModel, 'change', this.onChange.bind(this));
       }
+      this.onChange(this);
     }, this);
 
     // Listen to changes on input union:
