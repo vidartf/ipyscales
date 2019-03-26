@@ -190,9 +190,11 @@ class NamedOrdinalColorMap(OrdinalScale, ColorScale):
     _model_name = Unicode('NamedOrdinalColorMap').tag(sync=True)
 
     name = CaselessStrEnum(
-        set(scheme_only_colormaps.keys()) |
-        (set(seq_colormap_names) - set(non_scheme_sequential)) |
-        set(div_colormap_names),
+        sorted(
+            set(scheme_only_colormaps.keys()) |
+            (set(seq_colormap_names) - set(non_scheme_sequential)) |
+            set(div_colormap_names)
+        ),
         "Category10"
     ).tag(sync=True)
 

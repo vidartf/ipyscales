@@ -11,7 +11,7 @@ import {
 
 import {
   data_union_serialization, listenToUnion,
-  TypedArray, typesToArray, TypedArrayConstructor,
+  TypedArray, typesToArray,
   ISerializers, getArray, IDataWriteBack, setArray
 } from 'jupyter-dataserializers';
 
@@ -32,19 +32,11 @@ import {
 } from './version';
 
 import {
-  parseCssColor
+  parseCssColor, undefSerializer
 } from './utils';
 
 
 import ndarray = require('ndarray');
-
-
-/**
- * Serializer that prevents syncing to kernel
- */
-function undefSerializer(obj: any, widget?: WidgetModel): undefined {
-  return undefined;
-}
 
 
 /**
@@ -200,7 +192,19 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
 
     // Listen to changes within array and scale models:
     listenToUnion(this, 'data', this.onChange.bind(this), true);
+
     this.listenTo(this.get('scale'), 'change', this.onChange);
+    // make sure to (un)hook listeners when child points to new object
+    this.on('change:scale', (model: this, value: LinearScaleModel, options: any) => {
+      const prevModel = this.previous('scale') as LinearScaleModel;
+      const currModel = value;
+      if (prevModel) {
+        this.stopListening(prevModel);
+      }
+      if (currModel) {
+        this.listenTo(currModel, 'change', this.onChange.bind(this));
+      }
+    }, this);
   }
 
   getNDArray(key='scaledData'): ndarray | null {
@@ -327,7 +331,7 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
       ...DataModel.serializers,
       data: data_union_serialization,
       scale: { deserialize: unpack_models },
-      scaledData: {serialize: undefSerializer},
+      scaledData: { serialize: undefSerializer },
     };
 
   static model_name = 'ScaledArrayModel';

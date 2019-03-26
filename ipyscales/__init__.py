@@ -20,6 +20,7 @@ from .color import (
     NamedOrdinalColorMap
 )
 from .colorbar import ColorBar, ColorMapEditor
+from .value import ScaledValue
 
 # do not import data widgets, to ensure optional dep. on ipydatawidget
 

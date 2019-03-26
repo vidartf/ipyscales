@@ -141,8 +141,8 @@ export class WidgetDropdownModel extends SelectorBaseModel {
 
   static serializers = {
     ...SelectorBaseModel.serializers,
-    value: {deserialize: unpack_models},
-    options: {deserialize: unpack_models},
+    value: { deserialize: unpack_models },
+    options: { deserialize: unpack_models },
   }
 
   static model_name = 'StringDropdownModel';
