@@ -1,17 +1,20 @@
 language: python
 python:
-  # - 3.7   # travis does not yet support 3.7 without sudo
+  - 3.7
   - 3.6
   - 3.5
   - 2.7
 sudo: false
+dist: xenial
+addons:
+  firefox: latest
 env:
   matrix:
     - GROUP=python
 matrix:
   include:
     - python: 3.5
-      env: GROUP=js
+      env: GROUP=js MOZ_HEADLESS=1
 cache:
   pip: true
   directories:
@@ -19,7 +22,7 @@ cache:
     - $HOME/.npm
 before_install:
   - pip install -U pip setuptools
-  - nvm install 6
+  - nvm install 8
   - |
     if [[ $GROUP == python ]]; then
       pip install codecov
