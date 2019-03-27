@@ -14,5 +14,5 @@ python:
     extra_requirements:
     - examples
     - docs
-  conda:
-    environment: docs/environment.yml
+conda:
+  environment: docs/environment.yml
