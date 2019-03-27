@@ -5,7 +5,5 @@ channels:
 dependencies:
 - python=3.5
 - nodejs
-- ipywidgets
 - sphinx
-- nbsphinx
-- jupyter_sphinx
+# Other deps are pulled in via pip
