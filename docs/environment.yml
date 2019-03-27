@@ -2,5 +2,11 @@ name: ipyscales_docs
 channels:
   - conda-forge
 dependencies:
+- python=3.5
 - nodejs
-# Other deps are pulled in via pip
+- sphinx
+- nbsphinx
+- jupyter_sphinx
+- ipywidgets
+- ipydatawidgets
+- pypandoc
