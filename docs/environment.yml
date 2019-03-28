@@ -4,9 +4,7 @@ channels:
 dependencies:
 - python=3.5
 - nodejs
+- mock
+- pillow
 - sphinx
-- nbsphinx
-- jupyter_sphinx
-- ipywidgets
-- ipydatawidgets
-- pypandoc
+- sphinx_rtd_theme
