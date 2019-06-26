@@ -1,4 +1,4 @@
-{
+"{
   "name": "jupyter-scales",
   "version": "3.0.0",
   "description": "A widget library for scales",
@@ -11,7 +11,8 @@
     "dist/*.js",
     "dist/*.js.map",
     "dist/*.d.ts",
-    "src/**/*"
+    "src/**/*",
+    "styles/**/*"
   ],
   "scripts": {
     "clean:lib": "rimraf lib && rimraf lab",
