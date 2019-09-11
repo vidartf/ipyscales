@@ -9,8 +9,15 @@ Defines color scale widget, and any supporting functions
 """
 
 from traitlets import (
-    Float, Unicode, Bool, CaselessStrEnum, Undefined, Int,
-    TraitError, observe, validate
+    Float,
+    Unicode,
+    Bool,
+    CaselessStrEnum,
+    Undefined,
+    Int,
+    TraitError,
+    observe,
+    validate,
 )
 from ipywidgets import register, jslink, VBox
 
@@ -22,6 +29,7 @@ from .traittypes import FullColor, VarlenTuple
 
 class ColorScale(Scale):
     """A common base class for color scales"""
+
     pass
 
 
@@ -34,13 +42,18 @@ class LinearColorScale(LinearScale, ColorScale):
     See d3-interpolate for a list of interpolator names
     to use. Default uses 'interpolateRgb' for colors.
     """
-    _model_name = Unicode('LinearColorScaleModel').tag(sync=True)
 
-    range = VarlenTuple(trait=FullColor(), default_value=('black', 'white'), minlen=2).tag(sync=True)
+    _model_name = Unicode("LinearColorScaleModel").tag(sync=True)
+
+    range = VarlenTuple(
+        trait=FullColor(), default_value=("black", "white"), minlen=2
+    ).tag(sync=True)
 
     def edit(self):
         from .colorbar import ColorMapEditor
+
         return ColorMapEditor(colormap=self)
+
 
 @register
 class LogColorScale(LogScale, ColorScale):
@@ -51,17 +64,20 @@ class LogColorScale(LogScale, ColorScale):
     See d3-interpolate for a list of interpolator names
     to use. Default uses 'interpolateRgb' for colors.
     """
-    _model_name = Unicode('LogColorScaleModel').tag(sync=True)
 
-    range = VarlenTuple(trait=FullColor(), default_value=('black', 'white'), minlen=2).tag(sync=True)
+    _model_name = Unicode("LogColorScaleModel").tag(sync=True)
+
+    range = VarlenTuple(
+        trait=FullColor(), default_value=("black", "white"), minlen=2
+    ).tag(sync=True)
 
     def edit(self):
         from .colorbar import ColorMapEditor
+
         return ColorMapEditor(colormap=self)
 
 
-
-# List of valid colormap names 
+# List of valid colormap names
 # TODO: Write unit test that validates this vs the actual values in d3
 seq_colormap_names = (
     "Viridis",
@@ -107,28 +123,28 @@ div_colormap_names = (
 
 scheme_only_colormaps = {
     # Name: fixed cardinality
-    'Category10': 10,
-    'Accent': 8,
-    'Dark2': 8,
-    'Paired': 12,
-    'Pastel1': 9,
-    'Pastel2': 8,
-    'Set1': 9,
-    'Set2': 8,
-    'Set3': 12,
+    "Category10": 10,
+    "Accent": 8,
+    "Dark2": 8,
+    "Paired": 12,
+    "Pastel1": 9,
+    "Pastel2": 8,
+    "Set1": 9,
+    "Set2": 8,
+    "Set3": 12,
 }
 
 # These sequential scales do not have a discreet variant:
 non_scheme_sequential = (
-    'CubehelixDefault',
-    'Rainbow',
-    'Warm',
-    'Cool',
-    'Sinebow',
-    'Viridis',
-    'Magma',
-    'Inferno',
-    'Plasma',
+    "CubehelixDefault",
+    "Rainbow",
+    "Warm",
+    "Cool",
+    "Sinebow",
+    "Viridis",
+    "Magma",
+    "Inferno",
+    "Plasma",
 )
 
 
@@ -136,7 +152,8 @@ non_scheme_sequential = (
 class NamedSequentialColorMap(SequentialScale, ColorScale):
     """A linear scale widget for colors, initialized from a named color map.
     """
-    _model_name = Unicode('NamedSequentialColorMap').tag(sync=True)
+
+    _model_name = Unicode("NamedSequentialColorMap").tag(sync=True)
 
     name = CaselessStrEnum(seq_colormap_names, "Viridis").tag(sync=True)
 
@@ -148,9 +165,8 @@ class NamedSequentialColorMap(SequentialScale, ColorScale):
         children = []
 
         w = StringDropdown(
-            value=self.name,
-            options=seq_colormap_names,
-            description="Name")
+            value=self.name, options=seq_colormap_names, description="Name"
+        )
         jslink((self, "name"), (w, "value"))
         children.append(w)
 
@@ -161,7 +177,8 @@ class NamedSequentialColorMap(SequentialScale, ColorScale):
 class NamedDivergingColorMap(DivergingScale, ColorScale):
     """A linear scale widget for colors, initialized from a named color map.
     """
-    _model_name = Unicode('NamedDivergingColorMap').tag(sync=True)
+
+    _model_name = Unicode("NamedDivergingColorMap").tag(sync=True)
 
     name = CaselessStrEnum(div_colormap_names, "BrBG").tag(sync=True)
 
@@ -173,9 +190,8 @@ class NamedDivergingColorMap(DivergingScale, ColorScale):
         children = []
 
         w = StringDropdown(
-            value=self.name,
-            options=div_colormap_names,
-            description="Name")
+            value=self.name, options=div_colormap_names, description="Name"
+        )
         jslink((self, "name"), (w, "value"))
         children.append(w)
 
@@ -187,15 +203,15 @@ class NamedOrdinalColorMap(OrdinalScale, ColorScale):
     """An ordinal scale widget for colors, initialized from a named color map.
     """
 
-    _model_name = Unicode('NamedOrdinalColorMap').tag(sync=True)
+    _model_name = Unicode("NamedOrdinalColorMap").tag(sync=True)
 
     name = CaselessStrEnum(
         sorted(
-            set(scheme_only_colormaps.keys()) |
-            (set(seq_colormap_names) - set(non_scheme_sequential)) |
-            set(div_colormap_names)
+            set(scheme_only_colormaps.keys())
+            | (set(seq_colormap_names) - set(non_scheme_sequential))
+            | set(div_colormap_names)
         ),
-        "Category10"
+        "Category10",
     ).tag(sync=True)
 
     cardinality = Int(10, min=3, max=12).tag(sync=True)
@@ -206,13 +222,15 @@ class NamedOrdinalColorMap(OrdinalScale, ColorScale):
             cardinality = scheme_only_colormaps[name]
         except KeyError:
             pass
-        super(NamedOrdinalColorMap, self).__init__(name=name, cardinality=cardinality, **kwargs)
+        super(NamedOrdinalColorMap, self).__init__(
+            name=name, cardinality=cardinality, **kwargs
+        )
 
-    @observe('name', type='change')
+    @observe("name", type="change")
     def _on_name_change(self, change):
         # Ensure that N gets updated if fixed length scheme is used:
         try:
-            self.cardinality = scheme_only_colormaps[change['new']]
+            self.cardinality = scheme_only_colormaps[change["new"]]
         except KeyError:
             pass
 
@@ -226,7 +244,8 @@ class NamedOrdinalColorMap(OrdinalScale, ColorScale):
         w = StringDropdown(
             value=self.name,
             options=NamedOrdinalColorMap.name.values,
-            description="Name")
+            description="Name",
+        )
         jslink((self, "name"), (w, "value"))
         children.append(w)
 

@@ -8,16 +8,22 @@
 from ._version import __version__, version_info
 
 from .scale import (
-    Scale, SequentialScale, DivergingScale, QuantizeScale,
-    QuantileScale, TresholdScale, OrdinalScale,
+    Scale,
+    SequentialScale,
+    DivergingScale,
+    QuantizeScale,
+    QuantileScale,
+    TresholdScale,
+    OrdinalScale,
 )
-from .continuous import (
-    ContinuousScale, LinearScale, LogScale, PowScale,
-)
+from .continuous import ContinuousScale, LinearScale, LogScale, PowScale
 from .color import (
-    ColorScale, LinearColorScale, LogColorScale,
-    NamedSequentialColorMap, NamedDivergingColorMap,
-    NamedOrdinalColorMap
+    ColorScale,
+    LinearColorScale,
+    LogColorScale,
+    NamedSequentialColorMap,
+    NamedDivergingColorMap,
+    NamedOrdinalColorMap,
 )
 from .colorbar import ColorBar, ColorMapEditor
 from .value import ScaledValue

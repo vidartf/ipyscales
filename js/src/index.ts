@@ -8,4 +8,4 @@ export * from './datawidgets';
 export * from './selectors';
 export * from './value';
 
-export { version } from './version';
+export * from './version';

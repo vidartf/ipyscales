@@ -22,7 +22,7 @@ export class MockComm implements widgets.IClassicComm {
     this._on_msg = fn;
   }
 
-  _process_msg(msg: services.KernelMessage.ICommMsg) {
+  _process_msg(msg: services.KernelMessage.ICommMsgMsg) {
     if (this._on_msg) {
       return this._on_msg(msg);
     } else {
@@ -90,11 +90,11 @@ export class DummyManager extends widgets.ManagerBase<HTMLElement> {
   }
 
   _get_comm_info() {
-      return Promise.resolve({});
+    return Promise.resolve({});
   }
 
   _create_comm(comm_target_name: string, model_id: string, data?: any, metadata?: any, buffers?: ArrayBuffer[] | ArrayBufferView[]): Promise<widgets.IClassicComm> {
-      return Promise.resolve(new MockComm());
+    return Promise.resolve(new MockComm());
   }
 
   el: HTMLElement;
@@ -115,12 +115,24 @@ export function createTestModel<T extends widgets.WidgetModel>(
 
   let id = widgets.uuid();
   let modelOptions = {
-      widget_manager: widget_manager || new DummyManager(),
-      model_id: id,
+    widget_manager: widget_manager || new DummyManager(),
+    model_id: id,
   }
 
   return new constructor(attributes, modelOptions);
 
+}
+
+
+export async function createTestModelFromSerialized<T extends widgets.WidgetModel>(
+  constructor: Constructor<T>,
+  state?: any,
+  widget_manager?: widgets.WidgetModel['widget_manager'],
+): Promise<T> {
+  widget_manager = widget_manager || new DummyManager();
+  let attributes = await (constructor as any)._deserialize_state(state, widget_manager);
+
+  return createTestModel(constructor, attributes, widget_manager);
 }
 
 
@@ -131,6 +143,6 @@ export function createTestView<T extends widgets.WidgetView>(
 
   let mgr = model.widget_manager as DummyManager;
   mgr.testClasses[model.get('_view_name')] = viewCtor;
-  return model.widget_manager.create_view(model) as any;
+  return model.widget_manager.create_view(model, undefined) as any;
 
 }

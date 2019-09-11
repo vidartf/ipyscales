@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  InterpolatorFactory, scaleLinear, scaleLog, scalePow, ScaleLinear
+  scaleLinear, scaleLog, scalePow, InterpolatorFactory, ScaleLinear
 } from 'd3-scale';
 
 import * as d3Interpolate from 'd3-interpolate';
@@ -80,8 +80,7 @@ export abstract class ContinuousScaleModel extends ScaleModel {
 /**
  * A widget model of a linear scale
  */
-export
-class LinearScaleModel extends ContinuousScaleModel {
+export class LinearScaleModel extends ContinuousScaleModel {
 
   /**
    * Create the wrapped d3-scale scaleLinear object
@@ -103,8 +102,7 @@ class LinearScaleModel extends ContinuousScaleModel {
 /**
  * A widget model of a linear scale
  */
-export
-class LogScaleModel extends ContinuousScaleModel {
+export class LogScaleModel extends ContinuousScaleModel {
   defaults() {
     return {...super.defaults(),
       base: 10,
@@ -137,8 +135,7 @@ class LogScaleModel extends ContinuousScaleModel {
 /**
  * A widget model of a linear scale
  */
-export
-class PowScaleModel extends ContinuousScaleModel {
+export class PowScaleModel extends ContinuousScaleModel {
   defaults() {
     this.constructor
     return {...super.defaults(),

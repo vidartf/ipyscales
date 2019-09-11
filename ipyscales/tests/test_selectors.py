@@ -18,40 +18,46 @@ def test_stringsel_creation_blank():
     with pytest.raises(TypeError):
         StringDropdown()
 
+
 def test_stringsel_creation():
-    w = StringDropdown(('A', 'B', 'C'))
-    assert w.value == 'A'
+    w = StringDropdown(("A", "B", "C"))
+    assert w.value == "A"
+
 
 def test_stringsel_valid_change():
-    w = StringDropdown(('A', 'B', 'C'))
-    w.value = 'B'
-    assert w.value == 'B'
+    w = StringDropdown(("A", "B", "C"))
+    w.value = "B"
+    assert w.value == "B"
+
 
 def test_stringsel_invalid_change():
-    w = StringDropdown(('A', 'B', 'C'))
+    w = StringDropdown(("A", "B", "C"))
     with pytest.raises(TraitError):
-        w.value = 'D'
-
+        w.value = "D"
 
 
 def test_widgetsel_creation_blank():
     with pytest.raises(TypeError):
         WidgetDropdown()
 
+
 A = Widget()
 B = Widget()
 C = Widget()
 
+
 def test_widgetsel_creation():
     # Works after python 3.7:
-    #w = WidgetDropdown(dict(A=A, B=B, C=C))
-    w = WidgetDropdown(OrderedDict([('A', A), ('B', B), ('C', C)]))
+    # w = WidgetDropdown(dict(A=A, B=B, C=C))
+    w = WidgetDropdown(OrderedDict([("A", A), ("B", B), ("C", C)]))
     assert w.value == A
+
 
 def test_widgetsel_valid_change():
     w = WidgetDropdown(dict(A=A, B=B, C=C))
     w.value = B
     assert w.value == B
+
 
 def test_widgetsel_invalid_change():
     w = WidgetDropdown(dict(A=A, B=B, C=C))

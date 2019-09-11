@@ -22,7 +22,9 @@ class Base(DOMWidget):
     _view_module = Unicode(module_name).tag(sync=True)
     _view_module_version = Unicode(module_version).tag(sync=True)
 
-    colormap = Instance(ColorScale, allow_none=False).tag(sync=True, **widget_serialization)
+    colormap = Instance(ColorScale, allow_none=False).tag(
+        sync=True, **widget_serialization
+    )
 
     breadth = Int(30, min=1).tag(sync=True)
     border_thickness = Float(1.0).tag(sync=True)
@@ -33,11 +35,11 @@ class Base(DOMWidget):
 class ColorBar(Base):
     """A color bar widget, representing a color map"""
 
-    _model_name = Unicode('ColorBarModel').tag(sync=True)
-    _view_name = Unicode('ColorBarView').tag(sync=True)
+    _model_name = Unicode("ColorBarModel").tag(sync=True)
+    _view_name = Unicode("ColorBarView").tag(sync=True)
 
-    orientation = Enum(('vertical', 'horizontal'), 'vertical').tag(sync=True)
-    side = Enum(('bottomright', 'topleft'), 'bottomright').tag(sync=True)
+    orientation = Enum(("vertical", "horizontal"), "vertical").tag(sync=True)
+    side = Enum(("bottomright", "topleft"), "bottomright").tag(sync=True)
 
     length = Int(100, min=2).tag(sync=True)
     title = Unicode(None, allow_none=True).tag(sync=True)
@@ -49,8 +51,8 @@ class ColorBar(Base):
 class ColorMapEditor(Base):
     """A color map editor widget"""
 
-    _model_name = Unicode('ColorMapEditorModel').tag(sync=True)
-    _view_name = Unicode('ColorMapEditorView').tag(sync=True)
+    _model_name = Unicode("ColorMapEditorModel").tag(sync=True)
+    _view_name = Unicode("ColorMapEditorView").tag(sync=True)
 
-    orientation = Enum(('vertical', 'horizontal'), 'horizontal').tag(sync=True)
+    orientation = Enum(("vertical", "horizontal"), "horizontal").tag(sync=True)
     length = Int(300, min=2).tag(sync=True)

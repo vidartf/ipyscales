@@ -15,11 +15,8 @@ import {
 } from 'jupyter-dataserializers';
 
 import {
-  version, moduleName
+  MODULE_NAME, MODULE_VERSION
 } from './version';
-
-import ndarray = require('ndarray');
-
 
 
 export
@@ -189,7 +186,7 @@ abstract class ScaleModel extends WidgetModel {
     }
   }
 
-  onChildChanged(model: WidgetModel, options: any) {
+  onChildChanged(model: Backbone.Model, options: any) {
     // Propagate up hierarchy:
     this.trigger('childchange', this);
   }
@@ -200,11 +197,11 @@ abstract class ScaleModel extends WidgetModel {
   static serializers: ISerializerMap = WidgetModel.serializers;
 
   static model_name: string;    // Base model should not be instantiated directly
-  static model_module = moduleName;
-  static model_module_version = version;
+  static model_module = MODULE_NAME;
+  static model_module_version = MODULE_VERSION;
   static view_name = null;
   static view_module = null;
-  static view_module_version = version;
+  static view_module_version = MODULE_VERSION;
 
   /**
    * The underlying object this model represents.

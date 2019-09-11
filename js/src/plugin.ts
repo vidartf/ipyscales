@@ -1,4 +1,4 @@
-// Copyright (c) Jupyter Development Team.
+// Copyright (c) Jupyter Development Team
 // Distributed under the terms of the Modified BSD License.
 
 import {
@@ -10,54 +10,39 @@ import {
 } from '@phosphor/widgets';
 
 import {
-  Token
-} from '@phosphor/coreutils';
+  IJupyterWidgetRegistry
+ } from '@jupyter-widgets/base';
 
-import * as scales from '.';
+import * as scales from './widgets';
 
 import {
-  IJupyterWidgetRegistry, ExportMap
-} from "@jupyter-widgets/base";
+  MODULE_NAME, MODULE_VERSION
+} from './version';
 
 import '../styles/plugin.css';
 
-
-const EXTENSION_ID = 'jupyter.extensions.jupyter-scales'
-
+const EXTENSION_ID = 'jupyter-scales:plugin';
 
 /**
- * The token identifying the JupyterLab plugin.
+ * The example plugin.
  */
-export const IJupyterScales = new Token<IJupyterScales>(EXTENSION_ID);
-
-/**
- * The type of the provided value of the plugin in JupyterLab.
- */
-export interface IJupyterScales {
-};
-
-
-/**
- * The notebook diff provider.
- */
-const scalesProvider: IPlugin<Application<Widget>, IJupyterScales> = {
+const plugin: IPlugin<Application<Widget>, void> = {
   id: EXTENSION_ID,
   requires: [IJupyterWidgetRegistry],
   activate: activateWidgetExtension,
   autoStart: true
 };
 
-export default scalesProvider;
+export default plugin;
 
 
 /**
  * Activate the widget extension.
  */
-function activateWidgetExtension(app: Application<Widget>, widgetsManager: IJupyterWidgetRegistry): IJupyterScales {
-  widgetsManager.registerWidget({
-      name: 'jupyter-scales',
-      version: scales.version,
-      exports: scales as any as ExportMap,   // Typing isn't smart enough here
-    });
-  return {};
+function activateWidgetExtension(app: Application<Widget>, registry: IJupyterWidgetRegistry): void {
+  registry.registerWidget({
+    name: MODULE_NAME,
+    version: MODULE_VERSION,
+    exports: scales,
+  });
 }

@@ -22,15 +22,13 @@ class ContinuousScale(Scale):
     not be directly instantiated.
     """
 
-    domain = VarlenTuple(
-        trait=CFloat(),
-        default_value=(0., 1.),
-        minlen=2,
-    ).tag(sync=True)
+    domain = VarlenTuple(trait=CFloat(), default_value=(0.0, 1.0), minlen=2).tag(
+        sync=True
+    )
 
-    range = VarlenTuple(trait=Any(), default_value=(0., 1.), minlen=2).tag(sync=True)
+    range = VarlenTuple(trait=Any(), default_value=(0.0, 1.0), minlen=2).tag(sync=True)
 
-    interpolator = Unicode('interpolate').tag(sync=True)
+    interpolator = Unicode("interpolate").tag(sync=True)
     clamp = Bool(False).tag(sync=True)
 
 
@@ -41,7 +39,8 @@ class LinearScale(ContinuousScale):
     See the documentation for d3-scale's linear for
     further details.
     """
-    _model_name = Unicode('LinearScaleModel').tag(sync=True)
+
+    _model_name = Unicode("LinearScaleModel").tag(sync=True)
 
 
 @register
@@ -51,15 +50,15 @@ class LogScale(ContinuousScale):
     See the documentation for d3-scale's scaleLog for
     further details.
     """
-    _model_name = Unicode('LogScaleModel').tag(sync=True)
 
-    domain = VarlenTuple(
-        trait=CFloat(),
-        default_value=(1., 10.),
-        minlen=2,
-    ).tag(sync=True)
+    _model_name = Unicode("LogScaleModel").tag(sync=True)
+
+    domain = VarlenTuple(trait=CFloat(), default_value=(1.0, 10.0), minlen=2).tag(
+        sync=True
+    )
 
     base = Float(10).tag(sync=True)
+
 
 @register
 class PowScale(ContinuousScale):
@@ -68,6 +67,7 @@ class PowScale(ContinuousScale):
     See the documentation for d3-scale's scaleLog for
     further details.
     """
-    _model_name = Unicode('PowScaleModel').tag(sync=True)
+
+    _model_name = Unicode("PowScaleModel").tag(sync=True)
 
     exponent = Float(1).tag(sync=True)

@@ -1,10 +1,10 @@
 include LICENSE.txt
 include README.md
+include pyproject.toml
 
 include setupbase.py
 include pytest.ini
 include .coveragerc
-include readthedocs.yml
 
 # Documentation
 graft docs
@@ -22,7 +22,6 @@ graft js
 prune **/node_modules
 prune js/coverage
 prune js/lib
-prune js/dist
 
 # Patterns to exclude from any directory
 global-exclude *~

@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  WidgetModel, unpack_models
+  unpack_models, ManagerBase
 } from '@jupyter-widgets/base';
 
 import {
@@ -28,7 +28,7 @@ import {
 } from './continuous';
 
 import {
-  version, moduleName
+  MODULE_NAME, MODULE_VERSION
 } from './version';
 
 import {
@@ -37,6 +37,12 @@ import {
 
 
 import ndarray = require('ndarray');
+
+
+// Override typing
+declare module "@jupyter-widgets/base" {
+  function unpack_models(value?: any, manager?: ManagerBase<any>): Promise<any>;
+}
 
 
 /**
@@ -270,7 +276,7 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
    * @param {WidgetModel} model
    * @memberof ScaledArrayModel
    */
-  protected onChange(model: WidgetModel, options?: any): void {
+  protected onChange(model: Backbone.Model, options?: any): void {
     if (!options || options.setScaled !== true) {
       this.computeScaledData(options);
     }
@@ -335,6 +341,6 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
     };
 
   static model_name = 'ScaledArrayModel';
-  static model_module = moduleName;
-  static model_module_version = version;
+  static model_module = MODULE_NAME;
+  static model_module_version = MODULE_VERSION;
 }

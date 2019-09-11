@@ -10,18 +10,15 @@ A Jupyter widgets library for scales.
 
 ## Installation
 
-A typical installation requires the following three commands to be run:
+You can install using `pip`:
 
 ```bash
 pip install ipyscales
-jupyter nbextension install --py [--sys-prefix|--user|--system] ipyscales
-jupyter nbextension enable --py [--sys-prefix|--user|--system] ipyscales
 ```
 
-Or, if you use jupyterlab:
+If you are using Jupyter Notebook 5.2 or earlier, you may also need to enable
+the nbextension:
 
 ```bash
-pip install ipyscales
-jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build
-jupyter labextension install jupyterlab-scales
+jupyter nbextension enable --py [--sys-prefix|--user|--system] ipyscales
 ```

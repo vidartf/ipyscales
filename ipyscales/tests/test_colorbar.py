@@ -16,7 +16,8 @@ def test_colorbar_creation_blank():
     with pytest.raises(TraitError):
         ColorBar()
 
+
 def test_colorbar_creation():
-    colormap = LinearColorScale(range=('red', 'blue'))
+    colormap = LinearColorScale(range=("red", "blue"))
     w = ColorBar(colormap=colormap)
     assert w.colormap is colormap
