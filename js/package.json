@@ -15,7 +15,8 @@
     "dist/*.js",
     "dist/*.js.map",
     "dist/*.d.ts",
-    "src/**/*"
+    "src/**/*",
+    "styles/**/*"
   ],
   "homepage": "https://github.com/vidartf/ipyscales",
   "bugs": {
@@ -53,14 +54,13 @@
     "test:ie": "karma start --browsers=IE tests/karma.conf.js",
     "watch": "npm-run-all -p watch:*",
     "watch:lib": "tsc -w",
-    "watch:nbextension": "webpack --watch"
+    "watch:nbextension": "webpack --watch -d"
   },
   "dependencies": {
     "@jupyter-widgets/base": "^2.0.1",
     "@phosphor/coreutils": "^1.3.0",
     "chromabar": "^0.6.1",
     "d3-interpolate": "^1.3.2",
-    "d3-scale": "^3.0.0",
     "d3-scale-chromatic": "^1.3.3",
     "jupyter-dataserializers": "^2.0.2",
     "jupyter-datawidgets": "^5.1.0",
@@ -97,6 +97,9 @@
     "typescript": "~3.6.3",
     "webpack": "^4.39.1",
     "webpack-cli": "^3.3.6"
+  },
+  "peerDependencies": {
+    "d3-scale": "^3"
   },
   "jupyterlab": {
     "extension": "lib/plugin",

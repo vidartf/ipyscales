@@ -35,8 +35,8 @@ ensure_python(">=3.5")
 version = get_version(pjoin(HERE, name, "_version.py"))
 
 nb_path = pjoin(HERE, name, "nbextension", "static")
-js_path = pjoin(HERE, "ts")
-lab_path = pjoin(HERE, "ts", "lab-dist")
+js_path = pjoin(HERE, "js")
+lab_path = pjoin(HERE, "js", "lab-dist")
 
 # Representative files that should exist after a successful build
 jstargets = [pjoin(nb_path, "index.js"), pjoin(js_path, "lib", "plugin.js")]
@@ -85,7 +85,14 @@ setup_args = dict(
     include_package_data=True,
     install_requires=["ipywidgets>=7.0.0"],
     extras_require={
-        "test": ["pytest>=3.6", "pytest-cov", "nbval", "ipydatawidgets>=4.0"],
+        "test": [
+            "ipydatawidgets>=4.0",
+            "ipywidgets>=7.5",
+            "nbval",
+            "pytest>=3.6",
+            "pytest-cov",
+            "pytest_check_links",
+        ],
         "examples": ["ipydatawidgets>=4.0"],
         "docs": [
             "sphinx>=1.5",
@@ -93,7 +100,6 @@ setup_args = dict(
             "sphinx_rtd_theme",
             "nbsphinx>=0.2.13,<0.4.0",
             "nbsphinx-link",
-            "pytest_check_links",
             "pypandoc",
         ],
     },

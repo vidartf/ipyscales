@@ -60,7 +60,7 @@ script:
       py.test -l --cov-report xml:$TRAVIS_BUILD_DIR/coverage.xml --cov=ipyscales $TRAVIS_BUILD_DIR/examples || EXIT_STATUS=$?
       popd
     elif [[ $GROUP == js ]]; then
-      pushd ts
+      pushd js
       npm run test:ci || EXIT_STATUS=$?
       popd
     elif [[ $GROUP == docs ]]; then
