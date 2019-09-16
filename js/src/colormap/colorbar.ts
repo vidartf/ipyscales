@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  DOMWidgetModel, DOMWidgetView, ISerializers, WidgetModel, unpack_models
+  DOMWidgetModel, DOMWidgetView, ISerializers, WidgetModel, unpack_models, ManagerBase
 } from '@jupyter-widgets/base';
 
 import { Message } from '@phosphor/messaging';
@@ -14,8 +14,14 @@ import {
 import { select } from 'd3-selection';
 
 import {
-  version, moduleName
+  MODULE_NAME, MODULE_VERSION
 } from '../version';
+
+
+// Override typing
+declare module "@jupyter-widgets/base" {
+  function unpack_models(value?: any, manager?: ManagerBase<any>): Promise<any>;
+}
 
 
 export class ColorBarModel extends DOMWidgetModel {
@@ -70,7 +76,7 @@ export class ColorBarModel extends DOMWidgetModel {
 
   }
 
-  onChildChanged(model: WidgetModel) {
+  onChildChanged(model: Backbone.Model) {
     // Propagate up hierarchy:
     this.trigger('childchange', this);
   }
@@ -81,11 +87,11 @@ export class ColorBarModel extends DOMWidgetModel {
     }
 
   static model_name = 'ColorBarModel';
-  static model_module = moduleName;
-  static model_module_version = version;
+  static model_module = MODULE_NAME;
+  static model_module_version = MODULE_VERSION;
   static view_name = 'ColorBarView';
-  static view_module = moduleName;
-  static view_module_version = version;
+  static view_module = MODULE_NAME;
+  static view_module_version = MODULE_VERSION;
 }
 
 
@@ -124,8 +130,8 @@ export class ColorBarView extends DOMWidgetView {
 
     // Update DOM:
     let svg = select(this.el)
-      .selectAll<SVGSVGElement, null>('svg.jupyterColorbar').data([null]);
-    svg = svg.merge(svg.enter().append<SVGSVGElement>('svg')
+      .selectAll<SVGSVGElement | SVGGElement, null>('svg.jupyterColorbar').data([null]);
+    svg = svg.merge(svg.enter().append<SVGSVGElement | SVGGElement>('svg')
       .attr('class', 'jupyterColorbar'))
       .call(this.barFunc);
   }

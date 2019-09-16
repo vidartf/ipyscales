@@ -1,20 +1,33 @@
-
 const path = require('path');
 const version = require('./package.json').version;
 
+// Custom webpack rules
 const rules = [
   { test: /\.ts$/, loader: 'ts-loader' },
-  { test: /\.js$/, loader: "source-map-loader" },
+  { test: /\.js$/, loader: 'source-map-loader' },
+  { test: /\.css$/, use: ['style-loader', 'css-loader']}
 ];
 
+// Packages that shouldn't be bundled but loaded at runtime
 const externals = ['@jupyter-widgets/base'];
 
+const resolve = {
+  // Add '.ts' and '.tsx' as resolvable extensions.
+  extensions: [".webpack.js", ".web.js", ".ts", ".js"]
+};
+
 module.exports = [
+  /**
+   * Notebook extension
+   *
+   * This bundle only contains the part of the JavaScript that is run on load of
+   * the notebook.
+   */
   {
     entry: './src/extension.ts',
     output: {
       filename: 'index.js',
-      path: __dirname + '/../ipyscales/nbextension/static',
+      path: path.resolve(__dirname, '..', 'ipyscales', 'nbextension', 'static'),
       libraryTarget: 'amd'
     },
     module: {
@@ -22,61 +35,56 @@ module.exports = [
     },
     devtool: 'source-map',
     externals,
-    resolve: {
-      // Add '.ts' as resolvable a extension.
-      extensions: [".webpack.js", ".web.js", ".ts", ".js"]
-    }
+    resolve,
   },
-  {// Embeddable jupyter-scales bundle
-    //
-    // This bundle is generally almost identical to the notebook bundle
-    // containing the custom widget views and models.
-    //
-    // The only difference is in the configuration of the webpack public path
-    // for the static assets.
-    //
-    // It will be automatically distributed by unpkg to work with the static
-    // widget embedder.
-    //
-    // The target bundle is always `dist/index.js`, which is the path required
-    // by the custom widget embedder.
-    //
+
+  /**
+   * Embeddable jupyter-scales bundle
+   *
+   * This bundle is almost identical to the notebook extension bundle. The only
+   * difference is in the configuration of the webpack public path for the
+   * static assets.
+   *
+   * The target bundle is always `dist/index.js`, which is the path required by
+   * the custom widget embedder.
+   */
+  {
     entry: './src/index.ts',
     output: {
-        filename: 'index.js',
-        path: path.resolve(__dirname, 'dist'),
-        library: "jupyter-scales",
-        libraryTarget: 'amd',
-        publicPath: 'https://unpkg.com/jupyter-scales@' + version + '/dist/'
+      filename: 'index.js',
+      path: path.resolve(__dirname, 'dist'),
+      libraryTarget: 'amd',
+      library: "jupyter-scales",
+      publicPath: 'https://unpkg.com/jupyter-scales@' + version + '/dist/'
     },
     devtool: 'source-map',
     module: {
         rules: rules
     },
     externals,
-    resolve: {
-      // Add '.ts' as resolvable extensions.
-      extensions: [".webpack.js", ".web.js", ".ts", ".js"]
-    },
+    resolve,
   },
+
+
+  /**
+   * Documentation widget bundle
+   *
+   * This bundle is used to embed widgets in the package documentation.
+   */
   {
-    // embeddable bundle (e.g. for docs)
     entry: './src/index.ts',
     output: {
       filename: 'embed-bundle.js',
       path: path.resolve(__dirname, '..', 'docs', 'source', '_static'),
       library: "jupyter-scales",
-      libraryTarget: 'amd',
-      publicPath: 'https://unpkg.com/jupyter-scales@' + version + '/dist/'
+      libraryTarget: 'amd'
     },
-    devtool: 'source-map',
     module: {
       rules: rules
     },
+    devtool: 'source-map',
     externals,
-    resolve: {
-      // Add '.ts' as resolvable extensions.
-      extensions: [".webpack.js", ".web.js", ".ts", ".js"]
-    },
-  },
+    resolve,
+  }
+
 ];

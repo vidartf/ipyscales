@@ -9,13 +9,12 @@ import pytest
 from traitlets import TraitError
 import numpy as np
 
-from ..colorarray import (
-    ArrayColorScale
-)
+from ..colorarray import ArrayColorScale
 
 
 def test_arraycolorscale_creation_blank():
     ArrayColorScale()
+
 
 def test_arraycolorscale_accepts_2x3_list():
     ArrayColorScale(colors=[[0, 0, 0], [1, 1, 1]])
@@ -59,4 +58,4 @@ def test_arraycolorscale_accepts_2x4_array():
 
 
 def test_arraycolorscale_accepts_hsl():
-    ArrayColorScale(space='hsl')
+    ArrayColorScale(space="hsl")

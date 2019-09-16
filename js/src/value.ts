@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  WidgetModel, unpack_models
+  WidgetModel, unpack_models, ManagerBase
 } from '@jupyter-widgets/base';
 
 import {
@@ -18,12 +18,18 @@ import {
 } from './scale';
 
 import {
-  version, moduleName
+  MODULE_NAME, MODULE_VERSION
 } from './version';
 
 import {
   undefSerializer
 } from './utils';
+
+
+// Override typing
+declare module "@jupyter-widgets/base" {
+  function unpack_models(value?: any, manager?: ManagerBase<any>): Promise<any>;
+}
 
 
 /**
@@ -123,7 +129,7 @@ export class ScaledValueModel extends WidgetModel {
    * @param {WidgetModel} model
    * @memberof ScaledArrayModel
    */
-  protected onChange(model: WidgetModel, options?: any): void {
+  protected onChange(model: Backbone.Model, options?: any): void {
     if (!options || options.setOutputOf !== this) {
       this.computeScaledValue(options);
     }
@@ -144,9 +150,9 @@ export class ScaledValueModel extends WidgetModel {
     };
 
   static model_name = 'ScaledValueModel';
-  static model_module = moduleName;
-  static model_module_version = version;
+  static model_module = MODULE_NAME;
+  static model_module_version = MODULE_VERSION;
   static view_name = null;
   static view_module = null;
-  static view_module_version = version;
+  static view_module_version = MODULE_VERSION;
 }

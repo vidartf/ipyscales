@@ -5,129 +5,106 @@
 # Distributed under the terms of the Modified BSD License.
 
 from __future__ import print_function
-
-# the name of the project
-name = 'ipyscales'
-
-import sys
-
-#-----------------------------------------------------------------------------
-# get on with it
-#-----------------------------------------------------------------------------
-
-import io
-import os
 from glob import glob
+import os.path
+from os.path import join as pjoin
 
-from setuptools import setup, find_packages
 
-from setupbase import (create_cmdclass, install_npm, ensure_targets,
-    combine_commands, ensure_python, get_version)
+from jupyter_packaging import (
+    create_cmdclass,
+    install_npm,
+    ensure_targets,
+    find_packages,
+    combine_commands,
+    ensure_python,
+    get_version,
+)
 
-pjoin = os.path.join
-here = os.path.abspath(os.path.dirname(__file__))
-js_dir = pjoin(here, 'js')
+from setuptools import setup
 
-ensure_python(['2.7', '>=3.4'])
 
-version = get_version(pjoin(here, name, '_version.py'))
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+# The name of the project
+name = "ipyscales"
+
+# Ensure a valid python version
+ensure_python(">=3.5")
+
+# Get our version
+version = get_version(pjoin(HERE, name, "_version.py"))
+
+nb_path = pjoin(HERE, name, "nbextension", "static")
+js_path = pjoin(HERE, "js")
+lab_path = pjoin(HERE, "js", "lab-dist")
 
 # Representative files that should exist after a successful build
-jstargets = [
-    os.path.join(here, name, 'nbextension', 'static', 'extension.js'),
-    os.path.join(here, 'js', 'lib', 'index.js'),
-    os.path.join(here, 'js', 'lib', 'plugin.js'),
+jstargets = [pjoin(nb_path, "index.js"), pjoin(js_path, "lib", "plugin.js")]
+
+package_data_spec = {name: ["nbextension/static/*.*js*"]}
+
+data_files_spec = [
+    ("share/jupyter/nbextensions/jupyter-scales", nb_path, "*.js*"),
+    ("share/jupyter/lab/extensions", lab_path, "*.tgz"),
+    ("etc/jupyter", pjoin(HERE, "jupyter-config"), "**/*.json"),
 ]
 
 
-package_data = {
-    name: [
-        'nbextension/static/*.*',
-    ]
-}
-
-
-data_spec = [
-    ('share/jupyter/nbextensions/jupyter-scales',
-     name + '/nbextension/static',
-     '*.js'),
-    ('share/jupyter/lab/extensions',
-     'js/lab',
-     '*.tgz'),
-    ('etc/jupyter',
-     'jupyter-config',
-     '**/*.json'),
-]
-
-
-cmdclass = create_cmdclass('js', data_files_spec=data_spec)
-cmdclass['js'] = combine_commands(
-    install_npm(js_dir, build_targets=jstargets, sources=js_dir),
-    ensure_targets(jstargets),
+cmdclass = create_cmdclass(
+    "jsdeps", package_data_spec=package_data_spec, data_files_spec=data_files_spec
+)
+cmdclass["jsdeps"] = combine_commands(
+    install_npm(js_path, build_cmd="build:all"), ensure_targets(jstargets)
 )
 
 
 setup_args = dict(
-    name            = name,
-    description     = 'A widget library for scales',
-    version         = version,
-    scripts         = glob(pjoin('scripts', '*')),
-    cmdclass        = cmdclass,
-    packages        = find_packages(here),
-    package_data    = package_data,
-    author          = 'Jupyter Development Team',
-    author_email    = 'jupyter@googlegroups.com',
-    url             = 'https://github.com/vidartf/ipyscales',
-    license         = 'BSD',
-    platforms       = "Linux, Mac OS X, Windows",
-    keywords        = ['Jupyter', 'Widgets', 'IPython'],
-    classifiers     = [
-        'Intended Audience :: Developers',
-        'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: BSD License',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Framework :: Jupyter',
+    name=name,
+    description="A widget library for scales",
+    version=version,
+    scripts=glob(pjoin("scripts", "*")),
+    cmdclass=cmdclass,
+    packages=find_packages(HERE),
+    author="Jupyter Development Team",
+    author_email="jupyter@googlegroups.com",
+    url="https://github.com/vidartf/ipyscales",
+    license="BSD",
+    platforms="Linux, Mac OS X, Windows",
+    keywords=["Jupyter", "Widgets", "IPython"],
+    classifiers=[
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: BSD License",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Framework :: Jupyter",
     ],
+    include_package_data=True,
+    install_requires=["ipywidgets>=7.0.0"],
+    extras_require={
+        "test": [
+            "ipydatawidgets>=4.0",
+            "ipywidgets>=7.5",
+            "nbval",
+            "pytest>=3.6",
+            "pytest-cov",
+            "pytest_check_links",
+        ],
+        "examples": ["ipydatawidgets>=4.0"],
+        "docs": [
+            "sphinx>=1.5",
+            "recommonmark",
+            "sphinx_rtd_theme",
+            "nbsphinx>=0.2.13,<0.4.0",
+            "nbsphinx-link",
+            "pypandoc",
+        ],
+    },
+    entry_points={},
 )
 
-
-setuptools_args = {}
-install_requires = setuptools_args['install_requires'] = [
-    'ipywidgets>=7.0.0',
-]
-
-extras_require = setuptools_args['extras_require'] = {
-    'test': [
-        'pytest>=3.6',
-        'pytest-cov',
-        'nbval',
-        'ipydatawidgets>=4.0',
-    ],
-    'examples': [
-        'ipydatawidgets>=4.0',
-    ],
-    'docs': [
-        'sphinx>=1.5',
-        'recommonmark',
-        'sphinx_rtd_theme',
-        'nbsphinx>=0.2.13',
-        'jupyter_sphinx',
-        'nbsphinx-link>=1.1.1',
-        'pypandoc',
-    ],
-}
-
-if 'setuptools' in sys.modules:
-    setup_args.update(setuptools_args)
-
-    setup_args.pop('scripts', None)
-
-    setup_args.update(setuptools_args)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     setup(**setup_args)

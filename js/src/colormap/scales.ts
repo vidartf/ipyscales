@@ -21,10 +21,10 @@ declare module "d3-scale" {
 import * as d3Chromatic from 'd3-scale-chromatic';
 
 import {
-  TypedArray, data_union_array_serialization
+  data_union_array_serialization, TypedArray
 } from 'jupyter-dataserializers';
 
-import * as ndarray from 'ndarray';
+import ndarray = require('ndarray')
 
 import {
   LinearScaleModel, LogScaleModel

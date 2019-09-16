@@ -11,8 +11,10 @@ Scaled data widget.
 from ipywidgets import register, widget_serialization
 from traitlets import Instance, Unicode, Undefined, Union
 from ipydatawidgets import (
-    DataUnion, data_union_serialization, NDArraySource,
-    NDArrayBase
+    DataUnion,
+    data_union_serialization,
+    NDArraySource,
+    NDArrayBase,
 )
 
 from .scale import Scale
@@ -29,24 +31,24 @@ class ScaledArray(NDArraySource):
     only the scale changes.
     """
 
-    _model_name = Unicode('ScaledArrayModel').tag(sync=True)
+    _model_name = Unicode("ScaledArrayModel").tag(sync=True)
     _model_module = Unicode(module_name).tag(sync=True)
     _model_module_version = Unicode(module_version).tag(sync=True)
 
-    data = DataUnion(
-        help='The data to scale.'
-    ).tag(sync=True, **data_union_serialization)
+    data = DataUnion(help="The data to scale.").tag(
+        sync=True, **data_union_serialization
+    )
 
     scale = Instance(Scale).tag(sync=True, **widget_serialization)
 
     # TODO: Use Enum instead of free-text:
-    output_dtype = Unicode('inherit').tag(sync=True)
+    output_dtype = Unicode("inherit").tag(sync=True)
 
     def __init__(self, data=Undefined, scale=Undefined, **kwargs):
         super(ScaledArray, self).__init__(data=data, scale=scale, **kwargs)
 
     def _get_dtype(self):
-        if self.output_dtype == 'inherit':
+        if self.output_dtype == "inherit":
             return self.data.dtype
         return self.output_dtype
 

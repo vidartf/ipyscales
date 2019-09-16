@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  DOMWidgetModel, DOMWidgetView, ISerializers, WidgetModel, unpack_models
+  DOMWidgetModel, DOMWidgetView, ISerializers, WidgetModel, unpack_models, ManagerBase
 } from '@jupyter-widgets/base';
 
 import {
@@ -13,12 +13,18 @@ import {
 import { select } from 'd3-selection';
 
 import {
-  version, moduleName
+  MODULE_NAME, MODULE_VERSION
 } from '../version';
 
 import {
   ScaleModel
 } from '../scale'
+
+
+// Override typing
+declare module "@jupyter-widgets/base" {
+  function unpack_models(value?: any, manager?: ManagerBase<any>): Promise<any>;
+}
 
 
 export class ColorMapEditorModel extends DOMWidgetModel {
@@ -80,11 +86,11 @@ export class ColorMapEditorModel extends DOMWidgetModel {
     }
 
   static model_name = 'ColorMapEditorModel';
-  static model_module = moduleName;
-  static model_module_version = version;
+  static model_module = MODULE_NAME;
+  static model_module_version = MODULE_VERSION;
   static view_name = 'ColorMapEditorView';
-  static view_module = moduleName;
-  static view_module_version = version;
+  static view_module = MODULE_NAME;
+  static view_module_version = MODULE_VERSION;
 }
 
 
@@ -117,8 +123,8 @@ export class ColorMapEditorView extends DOMWidgetView {
       .padding(this.model.get('padding'))
       .borderThickness(this.model.get('border_thickness'));
     let svg = select(this.el)
-      .selectAll<SVGSVGElement, null>('svg.jupyterColorbar').data([null]);
-    svg = svg.merge(svg.enter().append<SVGSVGElement>('svg')
+      .selectAll<SVGSVGElement | SVGGElement, unknown>('svg.jupyterColorbar').data([null]);
+    svg = svg.merge(svg.enter().append<SVGSVGElement | SVGGElement>('svg')
       .attr('class', 'jupyterColorbar'));
     svg
       .call(this.editorFn);

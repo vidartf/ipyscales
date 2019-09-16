@@ -11,7 +11,7 @@ module.exports = function (config) {
     },
     files: [
       { pattern: "tests/src/**/*.ts" },
-      { pattern: "src/**/*.ts" }
+      { pattern: "src/**/*.ts" },
     ],
     exclude: [
       "src/plugin.ts",
@@ -26,12 +26,17 @@ module.exports = function (config) {
     singleRun: !config.debug,
     logLevel: config.LOG_INFO,
 
+    // you can define custom flags
+    customLaunchers: {
+      ChromeCI: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    },
+
 
     karmaTypescriptConfig: {
-      tsconfig: 'tests/src/tsconfig.json',
-      bundlerOptions: {
-        sourceMap: true
-      },
+      tsconfig: 'tests/tsconfig.json',
       coverageOptions: {
         instrumentation: !config.debug
       },
@@ -42,6 +47,23 @@ module.exports = function (config) {
           "directory": "coverage",
           "filename": "coverage.lcov"
         }
+      },
+      bundlerOptions: {
+        sourceMap: true,
+        acornOptions: {
+          ecmaVersion: 8,
+        },
+        transforms: [
+          require("karma-typescript-es6-transform")({
+            presets: [
+              ["env", {
+                targets: {
+                  browsers: ["last 2 Chrome versions"]
+                },
+              }]
+            ]
+          })
+        ]
       }
     }
   });

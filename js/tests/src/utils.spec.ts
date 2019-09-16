@@ -4,7 +4,7 @@
 import expect = require('expect.js');
 
 import {
-  arrayEquals, parseCssColor
+  parseCssColor
 } from '../../src/utils';
 
 

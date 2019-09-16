@@ -61,7 +61,8 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-docs/source/_static/embed-bundle.*
+docs/source/_static/embed-bundle.js
+docs/source/_static/embed-bundle.js.map
 
 # PyBuilder
 target/
@@ -145,6 +146,9 @@ $RECYCLE.BIN/
 
 **/node_modules/
 ipyscales/nbextension/static/index.*
+js/lab-dist/*.tgz
+js/package-lock.json
+js/yarn.lock
 
 # Coverage data
 # -------------
@@ -152,6 +156,3 @@ ipyscales/nbextension/static/index.*
 
 # Test data
 .pytest_cache
-
-# Lab dist
-js/lab/
