@@ -12,4 +12,4 @@ dependencies:
 - pypandoc
 - ipydatawidgets
 - pip:
-  git://github.com/spatialaudio/nbsphinx.git@master#egg=nbsphinx
+  - git://github.com/spatialaudio/nbsphinx.git@master#egg=nbsphinx
