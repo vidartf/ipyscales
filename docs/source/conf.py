@@ -200,6 +200,15 @@ nbsphinx_allow_errors = True  # exception ipstruct.py ipython_genutils
 
 
 def setup(app):
+    if on_rtd and not os.path.exists(
+        os.path.join(here, '_static', 'embed-bundle.js'
+    )):
+        # We don't have a develop install on RTD, ensure we get build output:
+        from subprocess import check_call
+        cwd = os.path.join(here, '..', '..', 'js')
+        check_call(['npm', 'install'], cwd=cwd)
+        check_call(['npm', 'run', 'build'], cwd=cwd)
+
     def add_scripts(app):
         for fname in ["helper.js", "embed-bundle.js"]:
             if not os.path.exists(os.path.join(here, "_static", fname)):

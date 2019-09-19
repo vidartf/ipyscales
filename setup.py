@@ -50,6 +50,11 @@ data_files_spec = [
 ]
 
 
+if os.environ.get("READTHEDOCS", None) == "True":
+    # On RTD, skip JS build to save resources
+    import jupyter_packaging
+    jupyter_packaging.skip_npm = True
+
 cmdclass = create_cmdclass(
     "jsdeps", package_data_spec=package_data_spec, data_files_spec=data_files_spec
 )
