@@ -210,12 +210,13 @@ def setup(app):
         check_call(['npm', 'run', 'build'], cwd=cwd)
 
     def add_scripts(app):
+        app.add_js_file("https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js")
         for fname in ["helper.js", "embed-bundle.js"]:
             if not os.path.exists(os.path.join(here, "_static", fname)):
                 from sphinx.util import logging
 
                 logger = logging.getLogger(__name__)
                 logger.warn("missing javascript file: %s" % fname)
-            app.add_javascript(fname)
+            app.add_js_file(fname)
 
     app.connect("builder-inited", add_scripts)
