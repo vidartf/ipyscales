@@ -198,8 +198,17 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 #
 nbsphinx_allow_errors = True  # exception ipstruct.py ipython_genutils
 
+import ipywidgets
+has_embed = False
+
+try:
+    import ipywidgets.embed
+    has_embed = True
+except ImportError:
+    pass
 
 def setup(app):
+
     if on_rtd and not os.path.exists(
         os.path.join(here, '_static', 'embed-bundle.js'
     )):
@@ -210,12 +219,18 @@ def setup(app):
         check_call(['npm', 'run', 'build'], cwd=cwd)
 
     def add_scripts(app):
-        app.add_js_file("https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js")
+        from sphinx.util import logging
+        logger = logging.getLogger(__name__)
+
+        if has_embed:
+            app.add_js_file('https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js')
+            app.add_js_file(ipywidgets.embed.DEFAULT_EMBED_REQUIREJS_URL)
+        else:
+            app.add_js_file('https://unpkg.com/jupyter-js-widgets@^2.0.13/dist/embed.js')
+
         for fname in ["helper.js", "embed-bundle.js"]:
             if not os.path.exists(os.path.join(here, "_static", fname)):
-                from sphinx.util import logging
 
-                logger = logging.getLogger(__name__)
                 logger.warn("missing javascript file: %s" % fname)
             app.add_js_file(fname)
 
