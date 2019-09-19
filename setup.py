@@ -103,7 +103,7 @@ setup_args = dict(
             "sphinx>=1.5",
             "recommonmark",
             "sphinx_rtd_theme",
-            "nbsphinx>=0.2.13,<0.4.0",
+            "nbsphinx>0.4.2",
             "nbsphinx-link",
             "pypandoc",
         ],
