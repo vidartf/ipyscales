@@ -7,8 +7,9 @@ dependencies:
 - nodejs
 - numpy
 - sphinx
-- nbsphinx
 - pip
 - ipywidgets
 - pypandoc
 - ipydatawidgets
+- pip:
+  git://github.com/spatialaudio/nbsphinx.git@master#egg=nbsphinx
