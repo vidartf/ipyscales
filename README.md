@@ -22,3 +22,9 @@ the nbextension:
 ```bash
 jupyter nbextension enable --py [--sys-prefix|--user|--system] ipyscales
 ```
+
+## Acknowledgements
+
+ipyscales is developed with financial support from:
+
+- OpenDreamKit Horizon 2020 European Research Infrastructures project (#676541), https://opendreamkit.org
