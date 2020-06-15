@@ -94,7 +94,7 @@ setup_args = dict(
             "ipydatawidgets>=4.0",
             "ipywidgets>=7.5",
             "nbval",
-            "pytest>=3.6",
+            "pytest>=4.6",
             "pytest-cov",
             "pytest_check_links",
         ],

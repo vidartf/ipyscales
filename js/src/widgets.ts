@@ -23,6 +23,13 @@ export {
 export { ScaledArrayModel } from './datawidgets';
 
 export {
+  QuantizeScaleModel,
+  QuantileScaleModel,
+  TresholdScaleModel,
+  OrdinalScaleModel,
+} from './scale';
+
+export {
   DropdownView,
   StringDropdownModel,
   WidgetDropdownModel
