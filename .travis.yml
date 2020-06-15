@@ -1,5 +1,6 @@
 language: python
 python:
+  - 3.8
   - 3.7
   - 3.6
 sudo: false
@@ -22,7 +23,7 @@ matrix:
 cache:
   pip: true
   directories:
-    - node_modules # NPM packages
+    - js/node_modules # NPM packages
     - $HOME/.npm
 before_install:
   - pip install -U pip setuptools
