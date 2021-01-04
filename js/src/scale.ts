@@ -180,13 +180,13 @@ abstract class ScaleModel extends WidgetModel {
     this.on('msg:custom', this.onCustomMessage, this);
   }
 
-  onChange(model: Backbone.Model, options: any) {
+  onChange(model: WidgetModel, options: any) {
     if (options !== 'pushFromObject') {
       this.syncToObject();
     }
   }
 
-  onChildChanged(model: Backbone.Model, options: any) {
+  onChildChanged(model: WidgetModel, options: any) {
     // Propagate up hierarchy:
     this.trigger('childchange', this);
   }

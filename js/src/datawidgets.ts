@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  unpack_models, ManagerBase
+  unpack_models, ManagerBase, WidgetModel
 } from '@jupyter-widgets/base';
 
 import {
@@ -276,7 +276,7 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
    * @param {WidgetModel} model
    * @memberof ScaledArrayModel
    */
-  protected onChange(model: Backbone.Model, options?: any): void {
+  protected onChange(model: WidgetModel, options?: any): void {
     if (!options || options.setScaled !== true) {
       this.computeScaledData(options);
     }

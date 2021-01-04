@@ -75,7 +75,7 @@ describe('ScaledArrayModel', () => {
       model_id: uuid(),
     }
     let serializedState = {};
-    let model = new ScaledArrayModel(serializedState, modelOptions);
+    let model = new ScaledArrayModel(serializedState, modelOptions as any);
     await model.initPromise;
 
     expect(model).to.be.an(ScaledArrayModel);

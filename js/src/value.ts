@@ -129,7 +129,7 @@ export class ScaledValueModel extends WidgetModel {
    * @param {WidgetModel} model
    * @memberof ScaledArrayModel
    */
-  protected onChange(model: Backbone.Model, options?: any): void {
+  protected onChange(model: WidgetModel, options?: any): void {
     if (!options || options.setOutputOf !== this) {
       this.computeScaledValue(options);
     }

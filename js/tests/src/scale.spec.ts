@@ -46,7 +46,7 @@ class BrokenModel extends ScaleModel {
   syncCalled = 0;
 }
 
-delete BrokenModel.prototype.constructObject;
+delete (BrokenModel as any).prototype.constructObject;
 
 
 describe('BaseModel', () => {
@@ -68,7 +68,7 @@ describe('BaseModel', () => {
         model_id: undefined,
       }
 
-      let p = Promise.resolve(new TestModel({}, modelOptions)).then(model => {
+      let p = Promise.resolve(new TestModel({}, modelOptions as any)).then(model => {
         return model.initPromise;
       })
 

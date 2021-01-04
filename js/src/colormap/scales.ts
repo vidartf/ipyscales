@@ -247,7 +247,7 @@ export class NamedOrdinalColorMap extends OrdinalScaleModel {
     const def = {...super.defaults(),
       name: 'Category10',
       cardinality: 10,
-    };
+    } as any;
     delete def.range;
     return def;
   }

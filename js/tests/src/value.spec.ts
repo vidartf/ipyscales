@@ -52,7 +52,7 @@ describe('ScaledValueModel', () => {
       model_id: uuid(),
     }
     let serializedState = {};
-    let model = new ScaledValueModel(serializedState, modelOptions);
+    let model = new ScaledValueModel(serializedState, modelOptions as any);
     await model.initPromise;
 
     expect(model).to.be.an(ScaledValueModel);

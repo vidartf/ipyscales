@@ -23,6 +23,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -62,6 +63,7 @@ instance/
 # Sphinx documentation
 docs/_build/
 docs/source/_static/embed-bundle.js
+docs/source/_static/embed-bundle.js.LICENSE.txt
 docs/source/_static/embed-bundle.js.map
 
 # PyBuilder
@@ -146,7 +148,7 @@ $RECYCLE.BIN/
 
 **/node_modules/
 ipyscales/nbextension/static/index.*
-js/lab-dist/*.tgz
+js/lab-dist/**/*
 js/package-lock.json
 js/yarn.lock
 
