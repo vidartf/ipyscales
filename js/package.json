@@ -35,10 +35,11 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "build": "npm run build:lib && npm run build:nbextension",
-    "build:all": "npm run build:labextension && npm run build:nbextension",
+    "build:all": "npm run build:labextension && npm run build:nbextension && npm run build:prebuilt",
     "build:labextension": "npm run clean:labextension && mkdirp lab-dist && cd lab-dist && npm pack ..",
     "build:lib": "tsc",
-    "build:nbextension": "webpack -p",
+    "build:nbextension": "webpack --mode=production",
+    "build:prebuilt": "jupyter labextension build .",
     "clean": "npm run clean:lib && npm run clean:nbextension",
     "clean:labextension": "rimraf lab-dist",
     "clean:lib": "rimraf lib",
@@ -51,32 +52,34 @@
     "test:debug": "karma start --browsers=Chrome --debug=true tests/karma.conf.js",
     "test:dev": "karma start --browsers=Chrome --singleRun=false tests/karma.conf.js",
     "test:firefox": "karma start --browsers=Firefox tests/karma.conf.js",
-    "test:ie": "karma start --browsers=IE tests/karma.conf.js",
     "update:all": "update-dependency --minimal --regex .*",
     "watch": "npm-run-all -p watch:*",
     "watch:lib": "tsc -w",
-    "watch:nbextension": "webpack --watch -d"
+    "watch:nbextension": "webpack --watch --mode=development"
   },
   "dependencies": {
-    "@jupyter-widgets/base": "^2.0.1 || ^3.0.0",
+    "@jupyter-widgets/base": "^2.0.1 || ^3 || ^4",
     "@phosphor/coreutils": "^1.3.0",
-    "chromabar": "^0.6.2",
-    "d3-interpolate": "^1.3.2",
-    "d3-scale-chromatic": "^1.3.3",
-    "jupyter-dataserializers": "^2.2.0",
-    "jupyter-datawidgets": "^5.3.0",
+    "chromabar": "^0.7.0",
+    "d3-interpolate": "^2.0.0",
+    "d3-scale": "^3.1.0",
+    "d3-scale-chromatic": "^2.0.0",
+    "d3-selection": "^1.4.0",
+    "jupyter-dataserializers": "^2.3.0",
+    "jupyter-datawidgets": "^5.4.0",
     "ndarray": "^1.0.18"
   },
   "devDependencies": {
-    "@jupyterlab/buildutils": "^2.1.0",
+    "@jupyterlab/builder": "^3.0.0",
+    "@jupyterlab/buildutils": "^3.0.0",
     "@phosphor/application": "^1.6.0",
     "@phosphor/widgets": "^1.6.0",
-    "@types/d3-interpolate": "^1.3.1",
+    "@types/d3-interpolate": "^2.0.0",
     "@types/d3-scale": "^2.1.1",
-    "@types/d3-scale-chromatic": "^1.3.1",
+    "@types/d3-scale-chromatic": "^2.0.0",
     "@types/d3-selection": "^1.4.1",
     "@types/expect.js": "^0.3.29",
-    "@types/mocha": "^7.0.2",
+    "@types/mocha": "^8.2.0",
     "@types/ndarray": "^1.0.6",
     "@types/node": "^14.0.13",
     "@types/webpack-env": "^1.13.6",
@@ -84,27 +87,38 @@
     "json-loader": "^0.5.7",
     "karma": "^5.1.0",
     "karma-chrome-launcher": "^3.0.0",
-    "karma-firefox-launcher": "^1.1.0",
-    "karma-ie-launcher": "^1.0.0",
+    "karma-firefox-launcher": "^2.1.0",
     "karma-mocha": "^2.0.1",
     "karma-mocha-reporter": "^2.2.5",
-    "karma-typescript": "^4.1.1",
-    "karma-typescript-es6-transform": "^4.1.1",
+    "karma-typescript": "^5.2.0",
+    "karma-typescript-es6-transform": "^5.2.0",
     "mkdirp": "^1.0.4",
     "mocha": "^8.0.1",
     "npm-run-all": "^4.1.3",
     "rimraf": "^3.0.2",
-    "source-map-loader": "^1.0.0",
-    "ts-loader": "^7.0.5",
-    "typescript": "^3.9.5",
-    "webpack": "^4.39.1",
-    "webpack-cli": "^3.3.6"
-  },
-  "peerDependencies": {
-    "d3-scale": "^3"
+    "source-map-loader": "^2.0.0",
+    "ts-loader": "^8.0.13",
+    "typescript": "^4.1.3",
+    "webpack": "^5.11.1",
+    "webpack-cli": "^4.3.1"
   },
   "jupyterlab": {
     "extension": "lib/plugin",
+    "outputDir": "lab-dist/jupyter-scales",
+    "sharedPackages": {
+      "@jupyter-widgets/base": {
+        "bundled": false,
+        "singleton": true
+      },
+      "jupyter-datawidgets": {
+        "bundled": true,
+        "singleton": true
+      },
+      "jupyter-dataserializers": {
+        "bundled": true,
+        "singleton": true
+      }
+    },
     "discovery": {
       "kernel": [
         {

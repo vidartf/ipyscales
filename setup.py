@@ -4,8 +4,8 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from __future__ import print_function
 from glob import glob
+from pathlib import Path
 import os.path
 from os.path import join as pjoin
 
@@ -14,16 +14,15 @@ from jupyter_packaging import (
     create_cmdclass,
     install_npm,
     ensure_targets,
-    find_packages,
     combine_commands,
     ensure_python,
     get_version,
 )
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
-HERE = os.path.abspath(os.path.dirname(__file__))
+HERE = Path(__file__).absolute().parent
 
 # The name of the project
 name = "ipyscales"
@@ -32,21 +31,25 @@ name = "ipyscales"
 ensure_python(">=3.5")
 
 # Get our version
-version = get_version(pjoin(HERE, name, "_version.py"))
+version = get_version(HERE.joinpath(name, "_version.py"))
 
-nb_path = pjoin(HERE, name, "nbextension", "static")
-js_path = pjoin(HERE, "js")
-lab_path = pjoin(HERE, "js", "lab-dist")
+nb_path = HERE.joinpath(name, "nbextension", "static")
+js_path = HERE.joinpath("js")
+lab_path = HERE.joinpath("js", "lab-dist")
 
 # Representative files that should exist after a successful build
-jstargets = [pjoin(nb_path, "index.js"), pjoin(js_path, "lib", "plugin.js")]
+jstargets = [
+    nb_path / "index.js",
+    js_path / "lib" / "plugin.js"
+]
 
 package_data_spec = {name: ["nbextension/static/*.*js*"]}
 
 data_files_spec = [
     ("share/jupyter/nbextensions/jupyter-scales", nb_path, "*.js*"),
     ("share/jupyter/lab/extensions", lab_path, "*.tgz"),
-    ("etc/jupyter", pjoin(HERE, "jupyter-config"), "**/*.json"),
+    ('share/jupyter/labextensions/jupyter-scales', lab_path / 'jupyter-scales', '**/*.*'),
+    ("etc/jupyter", HERE / "jupyter-config", "**/*.json"),
 ]
 
 
@@ -69,11 +72,11 @@ setup_args = dict(
     version=version,
     scripts=glob(pjoin("scripts", "*")),
     cmdclass=cmdclass,
-    packages=find_packages(HERE),
-    author="Jupyter Development Team",
-    author_email="jupyter@googlegroups.com",
+    packages=find_packages(str(HERE)),
+    author="Vidar T Fauske",
+    author_email="vidartf@gmail.com",
     url="https://github.com/vidartf/ipyscales",
-    license="BSD",
+    license="BSD-3-Clause",
     platforms="Linux, Mac OS X, Windows",
     keywords=["Jupyter", "Widgets", "IPython"],
     classifiers=[
@@ -82,23 +85,24 @@ setup_args = dict(
         "License :: OSI Approved :: BSD License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         "Framework :: Jupyter",
     ],
     include_package_data=True,
     install_requires=["ipywidgets>=7.0.0"],
     extras_require={
         "test": [
-            "ipydatawidgets>=4.0",
-            "ipywidgets>=7.5",
+            "ipydatawidgets>=4.2",
+            "ipywidgets>=7.6",
             "nbval",
             "pytest>=4.6",
             "pytest-cov",
             "pytest_check_links",
         ],
-        "examples": ["ipydatawidgets>=4.0"],
+        "examples": ["ipydatawidgets>=4.2"],
         "docs": [
             "sphinx>=1.5",
             "recommonmark",

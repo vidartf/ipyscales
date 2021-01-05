@@ -5,3 +5,7 @@ tests/
 # Ignore any build output from python:
 dist/*.tar.gz
 dist/*.wheel
+
+# Ignore dev noise
+coverage/
+lab-dist/

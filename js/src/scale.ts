@@ -180,13 +180,13 @@ abstract class ScaleModel extends WidgetModel {
     this.on('msg:custom', this.onCustomMessage, this);
   }
 
-  onChange(model: Backbone.Model, options: any) {
+  onChange(model: WidgetModel, options: any) {
     if (options !== 'pushFromObject') {
       this.syncToObject();
     }
   }
 
-  onChildChanged(model: Backbone.Model, options: any) {
+  onChildChanged(model: WidgetModel, options: any) {
     // Propagate up hierarchy:
     this.trigger('childchange', this);
   }
@@ -361,7 +361,6 @@ export class OrdinalScaleModel extends ScaleModel {
   createPropertiesArrays() {
     super.createPropertiesArrays();
     this.simpleProperties.push(
-      'domain',
       'range',
       'unknown',
     );
@@ -370,6 +369,22 @@ export class OrdinalScaleModel extends ScaleModel {
   constructObject() {
     return scaleOrdinal();
   }
+
+  /**
+   * Update the model attributes from the objects properties.
+   */
+  syncToModel(toSet: Backbone.ObjectHash): void {
+    toSet['domain'] = this.obj.domain();
+    super.syncToModel(toSet);
+  }
+
+  /**
+   * Update the model attributes from the objects properties.
+   */
+  syncToObject(): void {
+    super.syncToObject();
+    this.obj.domain(this.get('domain') ?? []);
+  };
 
   obj: ScaleOrdinal<any, any>;
 
