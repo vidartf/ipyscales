@@ -361,7 +361,6 @@ export class OrdinalScaleModel extends ScaleModel {
   createPropertiesArrays() {
     super.createPropertiesArrays();
     this.simpleProperties.push(
-      'domain',
       'range',
       'unknown',
     );
@@ -370,6 +369,22 @@ export class OrdinalScaleModel extends ScaleModel {
   constructObject() {
     return scaleOrdinal();
   }
+
+  /**
+   * Update the model attributes from the objects properties.
+   */
+  syncToModel(toSet: Backbone.ObjectHash): void {
+    toSet['domain'] = this.obj.domain();
+    super.syncToModel(toSet);
+  }
+
+  /**
+   * Update the model attributes from the objects properties.
+   */
+  syncToObject(): void {
+    super.syncToObject();
+    this.obj.domain(this.get('domain') ?? []);
+  };
 
   obj: ScaleOrdinal<any, any>;
 
