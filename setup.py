@@ -15,7 +15,6 @@ from jupyter_packaging import (
     install_npm,
     ensure_targets,
     combine_commands,
-    ensure_python,
     get_version,
 )
 
@@ -26,10 +25,6 @@ HERE = Path(__file__).absolute().parent
 
 # The name of the project
 name = "ipyscales"
-
-# Ensure a valid python version
-ensure_python(">=3.5")
-
 # Get our version
 version = get_version(HERE.joinpath(name, "_version.py"))
 
@@ -52,12 +47,6 @@ data_files_spec = [
     ("etc/jupyter", HERE / "jupyter-config", "**/*.json"),
 ]
 
-
-if os.environ.get("READTHEDOCS", None) == "True":
-    # On RTD, skip JS build to save resources
-    import jupyter_packaging
-    jupyter_packaging.skip_npm = True
-
 cmdclass = create_cmdclass(
     "jsdeps", package_data_spec=package_data_spec, data_files_spec=data_files_spec
 )
@@ -69,6 +58,8 @@ cmdclass["jsdeps"] = combine_commands(
 setup_args = dict(
     name=name,
     description="A widget library for scales",
+    long_description=(HERE / "README.md").read_text(encoding="utf-8"),
+    long_description_content_type='text/markdown',
     version=version,
     scripts=glob(pjoin("scripts", "*")),
     cmdclass=cmdclass,
@@ -92,6 +83,7 @@ setup_args = dict(
         "Framework :: Jupyter",
     ],
     include_package_data=True,
+    python_requires=">=3.7",
     install_requires=["ipywidgets>=7.0.0"],
     extras_require={
         "test": [

@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  DOMWidgetModel, DOMWidgetView, ISerializers, WidgetModel, unpack_models, ManagerBase
+  DOMWidgetModel, DOMWidgetView, ISerializers, IWidgetManager, WidgetModel, unpack_models
 } from '@jupyter-widgets/base';
 
 import {
@@ -23,9 +23,8 @@ import {
 
 // Override typing
 declare module "@jupyter-widgets/base" {
-  function unpack_models(value?: any, manager?: ManagerBase<any>): Promise<any>;
+  function unpack_models(value?: any, manager?: IWidgetManager): Promise<any>;
 }
-
 
 export class ColorMapEditorModel extends DOMWidgetModel {
   defaults() {

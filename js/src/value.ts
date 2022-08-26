@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  WidgetModel, unpack_models, ManagerBase
+  WidgetModel, unpack_models, IWidgetManager
 } from '@jupyter-widgets/base';
 
 import {
@@ -28,7 +28,7 @@ import {
 
 // Override typing
 declare module "@jupyter-widgets/base" {
-  function unpack_models(value?: any, manager?: ManagerBase<any>): Promise<any>;
+  function unpack_models(value?: any, manager?: IWidgetManager): Promise<any>;
 }
 
 

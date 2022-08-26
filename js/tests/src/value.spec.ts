@@ -8,6 +8,10 @@ import {
 } from '@jupyter-widgets/base';
 
 import {
+  ManagerBase
+} from '@jupyter-widgets/base-manager';
+
+import {
   LinearScaleModel
 } from '../../src/continuous';
 
@@ -61,7 +65,7 @@ describe('ScaledValueModel', () => {
 
   it('should not include output in serialization', async () => {
     const model = await createWidgetModel();
-    const state = await model.widget_manager.get_state();
+    const state = await (model.widget_manager as ManagerBase).get_state();
     const models = Object.keys(state.state).map(k => state.state[k].state);
     expect(models.length).to.be(2);
     expect(models[1]._model_name).to.be('ScaledValueModel');

@@ -2,10 +2,10 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  DOMWidgetModel, DOMWidgetView, ISerializers, WidgetModel, unpack_models, ManagerBase
+  DOMWidgetModel, DOMWidgetView, ISerializers, IWidgetManager, WidgetModel, unpack_models
 } from '@jupyter-widgets/base';
 
-import { Message } from '@phosphor/messaging';
+import { Message } from '@lumino/messaging';
 
 import {
   chromabar, ChromaBar
@@ -20,7 +20,7 @@ import {
 
 // Override typing
 declare module "@jupyter-widgets/base" {
-  function unpack_models(value?: any, manager?: ManagerBase<any>): Promise<any>;
+  function unpack_models(value?: any, manager?: IWidgetManager): Promise<any>;
 }
 
 
@@ -105,14 +105,22 @@ export class ColorBarView extends DOMWidgetView {
     this.model.on('childchange', this.onChange, this);
   }
 
-  processPhosphorMessage(msg: Message) {
-    super.processPhosphorMessage.call(this, msg);
+  _processLuminoMessage(msg: Message, _super: (msg: Message) => void): void {
+    _super.call(this, msg);
     switch (msg.type) {
     case 'after-attach':
       // Auto-sizing should be updated when attached to DOM:
       this.onChange();
       break;
     }
+  }
+
+  processPhosphorMessage(msg: Message): void {
+    this._processLuminoMessage(msg, (DOMWidgetView as any).processPhosphorMessage);
+  }
+
+  processLuminoMessage(msg: Message): void {
+    this._processLuminoMessage(msg, (DOMWidgetView as any).processLuminoMessage);
   }
 
   onChange() {

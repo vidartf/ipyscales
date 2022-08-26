@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  unpack_models, ManagerBase, WidgetModel
+  IWidgetManager, unpack_models, WidgetModel
 } from '@jupyter-widgets/base';
 
 import {
@@ -41,7 +41,7 @@ import ndarray = require('ndarray');
 
 // Override typing
 declare module "@jupyter-widgets/base" {
-  function unpack_models(value?: any, manager?: ManagerBase<any>): Promise<any>;
+  function unpack_models(value?: any, manager?: IWidgetManager): Promise<any>;
 }
 
 
@@ -52,14 +52,14 @@ declare module "@jupyter-widgets/base" {
  * @returns {ndarray.NDArray}
  */
 export function arrayFrom(
-  array: ndarray,
+  array: ndarray.NdArray,
   dtype?: ndarray.DataType | null,
   shape?: number[] | null
-): ndarray {
+): ndarray.NdArray {
 
   dtype = dtype || array.dtype;
   shape = shape || array.shape;
-  if (dtype === 'buffer' || dtype === 'generic' || dtype === 'array') {
+  if ((dtype as string) === 'buffer' || dtype === 'generic' || dtype === 'array' || dtype === 'bigint64' || dtype === 'biguint64') {
     throw new Error(`Cannot create ndarray of dtype "${dtype}".`);
   }
   return ndarray(
@@ -132,7 +132,7 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
       return;
     }
     let resized = this.arrayMismatch();
-    let scaledData = this.get('scaledData') as ndarray;
+    let scaledData = this.get('scaledData') as ndarray.NdArray;
     if (resized) {
       // Allocate new array
       scaledData = arrayFrom(array, this.scaledDtype(), this.scaledShape());
@@ -213,7 +213,7 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
     }, this);
   }
 
-  getNDArray(key='scaledData'): ndarray | null {
+  getNDArray(key='scaledData'): ndarray.NdArray | null {
     if (key === 'scaledData') {
       if (this.get('scaledData') === null) {
         this.computeScaledData();
@@ -238,7 +238,7 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
     return !!scale && typeof scale.obj.invert === 'function';
   }
 
-  setNDArray(array: ndarray | null, key='scaledData', options?: any): void {
+  setNDArray(array: ndarray.NdArray | null, key='scaledData', options?: any): void {
     if (key === 'scaledData') {
       // Writing back, we need to feed the data through scale.invert()
 
@@ -290,7 +290,7 @@ export class ScaledArrayModel extends DataModel implements IDataWriteBack {
    * @memberof ScaledArrayModel
    */
   protected arrayMismatch(): boolean {
-    const current = this.get('scaledData') as ndarray | null;
+    const current = this.get('scaledData') as ndarray.NdArray | null;
     if (current && current.dtype !== this.scaledDtype()) {
       return true;
     }

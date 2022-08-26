@@ -114,7 +114,7 @@ export class WidgetDropdownModel extends SelectorBaseModel {
     this.reverseMap = {};
     for (let key of Object.keys(value)) {
       const v = value[key];
-      if (v && v.toJSON) {
+      if (v && (v as any).toJSON) {
         this.reverseMap[value[key].toJSON({})] = key;
       }
     }
