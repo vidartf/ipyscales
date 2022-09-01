@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  WidgetModel, ManagerBase
+  WidgetModel, IWidgetManager
 } from '@jupyter-widgets/base';
 
 import {
@@ -22,7 +22,7 @@ import {
 export
 interface ISerializerMap {
   [key: string]: {
-    deserialize?: (value?: any, manager?: ManagerBase<any>) => any;
+    deserialize?: (value?: any, manager?: IWidgetManager) => any;
     serialize?: (value?: any, widget?: WidgetModel) => any;
   };
 }
@@ -31,7 +31,7 @@ export
 interface IInitializeOptions {
   model_id: string;
   comm?: any;
-  widget_manager: ManagerBase<any>;
+  widget_manager: IWidgetManager;
 }
 
 
@@ -391,7 +391,7 @@ export class OrdinalScaleModel extends ScaleModel {
   static serializers = {
     ...ScaleModel.serializers,
     unknown: {
-      deserialize: (value?: any, manager?: ManagerBase<any>) => {
+      deserialize: (value?: any, manager?: IWidgetManager) => {
         return value === '__implicit'
           ? scaleImplicit
           : value === null

@@ -165,7 +165,7 @@ class NamedSequentialColorMap(SequentialScale, ColorScale):
         children = []
 
         w = StringDropdown(
-            value=self.name, options=seq_colormap_names, description="Name"
+            value=self.name, options=seq_colormap_names
         )
         jslink((self, "name"), (w, "value"))
         children.append(w)
@@ -190,7 +190,7 @@ class NamedDivergingColorMap(DivergingScale, ColorScale):
         children = []
 
         w = StringDropdown(
-            value=self.name, options=div_colormap_names, description="Name"
+            value=self.name, options=div_colormap_names
         )
         jslink((self, "name"), (w, "value"))
         children.append(w)
@@ -244,7 +244,6 @@ class NamedOrdinalColorMap(OrdinalScale, ColorScale):
         w = StringDropdown(
             value=self.name,
             options=NamedOrdinalColorMap.name.values,
-            description="Name",
         )
         jslink((self, "name"), (w, "value"))
         children.append(w)

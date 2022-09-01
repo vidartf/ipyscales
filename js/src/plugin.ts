@@ -2,12 +2,12 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  Application, /*IPlugin*/
-} from '@phosphor/application';
+  Application, IPlugin
+} from '@lumino/application';
 
 import {
   Widget
-} from '@phosphor/widgets';
+} from '@lumino/widgets';
 
 import {
   IJupyterWidgetRegistry
@@ -26,7 +26,7 @@ const EXTENSION_ID = 'jupyter-scales:plugin';
 /**
  * The example plugin.
  */
-const plugin: any /* IPlugin<Application<any >, void>  Only until phosphor -> lumino rename is completed */ = {
+const plugin: IPlugin<Application<any >, void> = {
   id: EXTENSION_ID,
   requires: [IJupyterWidgetRegistry],
   activate: activateWidgetExtension,

@@ -8,6 +8,10 @@ import {
 } from '@jupyter-widgets/base';
 
 import {
+  ManagerBase
+} from '@jupyter-widgets/base-manager';
+
+import {
   JSONToArray, getArray
 } from 'jupyter-dataserializers';
 
@@ -84,7 +88,7 @@ describe('ScaledArrayModel', () => {
 
   it('should not include scaledData in serialization', async () => {
     const model = await createWidgetModel();
-    const state = await model.widget_manager.get_state();
+    const state = await (model.widget_manager as ManagerBase).get_state();
     const models = Object.keys(state.state).map(k => state.state[k].state);
     expect(models.length).to.be(2);
     expect(models[1]._model_name).to.be('ScaledArrayModel');
@@ -103,7 +107,7 @@ describe('ScaledArrayModel', () => {
     let model = await createWidgetModel();
 
     let triggered = false;
-    model.on('change:scaledData', (model: WidgetModel, value: ndarray | null, options: any) => {
+    model.on('change:scaledData', (model: WidgetModel, value: ndarray.NdArray | null, options: any) => {
       triggered = true;
     });
     model.set('scale', null);
@@ -115,10 +119,10 @@ describe('ScaledArrayModel', () => {
   it('should trigger change when changing from null', async () => {
     let model = await createWidgetModel();
 
-    let array = model.get('data') as ndarray;
+    let array = model.get('data') as ndarray.NdArray;
     model.set('data', null);
     let triggered = false;
-    model.on('change:scaledData', (model: WidgetModel, value: ndarray | null, options: any) => {
+    model.on('change:scaledData', (model: WidgetModel, value: ndarray.NdArray | null, options: any) => {
       triggered = true;
     });
     model.set('data', array);
@@ -133,7 +137,7 @@ describe('ScaledArrayModel', () => {
 
     let array = ndarray(new Float64Array([1, 2, 3, 4, 5, 10]));
     let triggered = false;
-    model.on('change:scaledData', (model: WidgetModel, value: ndarray | null, options: any) => {
+    model.on('change:scaledData', (model: WidgetModel, value: ndarray.NdArray | null, options: any) => {
       triggered = true;
     });
     model.set('data', array);
@@ -147,10 +151,10 @@ describe('ScaledArrayModel', () => {
   it('should not trigger change when still incomplete', async () => {
     let model = await createWidgetModel();
 
-    let array = model.get('data') as ndarray;
+    let array = model.get('data') as ndarray.NdArray;
     model.set({data: null, scale: null});
     let triggered = false;
-    model.on('change:scaledData', (model: WidgetModel, value: ndarray | null, options: any) => {
+    model.on('change:scaledData', (model: WidgetModel, value: ndarray.NdArray | null, options: any) => {
       triggered = true;
     });
     model.set('data', array);
@@ -162,11 +166,11 @@ describe('ScaledArrayModel', () => {
   it('should write in-place when only content changed', async () => {
     let model = await createWidgetModel();
 
-    let array = model.get('data') as ndarray;
+    let array = model.get('data') as ndarray.NdArray;
     array = arrayFrom(array);
     (array.data as Float32Array).set([1, 2, 3, 4, 5, 0]);
     let triggered = false;
-    model.on('change:scaledData', (model: WidgetModel, value: ndarray | null, options: any) => {
+    model.on('change:scaledData', (model: WidgetModel, value: ndarray.NdArray | null, options: any) => {
       triggered = true;
     });
     model.set('data', array);
@@ -380,14 +384,14 @@ describe('ScaledArrayModel', () => {
       it('should pass the options to change event', () => {
         let condA = false;
         let condB = false;
-        model.once('change:data', (model: WidgetModel, value: ndarray | null, options?: any) => {
+        model.once('change:data', (model: WidgetModel, value: ndarray.NdArray | null, options?: any) => {
           if (options.foo === 'bar') {
             condA = true;
           } else {
             throw new Error(`options.foo !== 'bar'. options: ${JSON.stringify(options)}`);
           }
         });
-        model.once('change:scaledData', (model: WidgetModel, value: ndarray | null, options?: any) => {
+        model.once('change:scaledData', (model: WidgetModel, value: ndarray.NdArray | null, options?: any) => {
           if (options.foo === 'bar') {
             condB = true;
           } else {

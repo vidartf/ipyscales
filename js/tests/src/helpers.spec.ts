@@ -2,6 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import * as widgets from '@jupyter-widgets/base';
+import { ManagerBase } from '@jupyter-widgets/base-manager';
 import * as services from '@jupyterlab/services';
 
 let numComms = 0;
@@ -54,7 +55,7 @@ export class MockComm implements widgets.IClassicComm {
   _on_open: Function | null = null;
 }
 
-export class DummyManager extends widgets.ManagerBase<HTMLElement> {
+export class DummyManager extends ManagerBase {
   constructor() {
     super();
     this.el = window.document.createElement('div');

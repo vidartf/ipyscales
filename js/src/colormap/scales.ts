@@ -79,7 +79,7 @@ export class ArrayColorScaleModel extends SequentialScaleModel<string> {
 
   createInterpolator(): (t: number) => any {
     const space = this.get('space') as string;
-    const colors = this.get('colors') as ndarray;
+    const colors = this.get('colors') as ndarray.NdArray;
     const factory = space === 'hsl' ? hsl : rgb;
     const spaceColors = [];
     const alpha = colors.shape[1] > 3;
