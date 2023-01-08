@@ -50,7 +50,7 @@ def test_arraycolorscale_fails_2x5_list():
 
 
 def test_arraycolorscale_accepts_2x3_array():
-    ArrayColorScale(colors=np.array([[0, 0, 0], [1, 1, 1]], dtype=np.float))
+    ArrayColorScale(colors=np.array([[0, 0, 0], [1, 1, 1]], dtype=float))
 
 
 def test_arraycolorscale_accepts_2x4_array():
